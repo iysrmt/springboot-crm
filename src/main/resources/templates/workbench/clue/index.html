@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+
+    <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" rel="stylesheet"
+          type="text/css"/>
+    <link href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css" rel="stylesheet" type="text/css">
+
+    <script src="jquery/jquery-1.11.1-min.js"></script>
+    <script src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+    <script src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+    <script src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+    <script src="jquery/bs_pagination-master/localization/zh.js"></script>
+
+    <title></title>
+    <script>
+        $(function () {
+            // ======================================== 入口函数 start ========================================
+
+            // 线索 创建按钮 添加单机事件
+            $("#create-clue-btn").click(function () {
+                // 清空模态窗口中的内容
+                $("#create-clue-form")[0].reset();
+                // 打开创建线索的模态窗口
+                $("#createClueModal").modal("show");
+            })
+            // 创建线索 保存按钮添加单击事件
+            $("#save-clue-btn").click(function () {
+                // 收集参数
+                // 姓名 非空
+                let fullName = $.trim($("#create-fullname").val());
+                // 称呼
+                let appellation = $("#create-appellation").val();
+                // 所有者 非空
+                let owner = $("#create-owner").val();
+                // 公司 非空
+                let company = $.trim($("#create-company").val());
+                // 职位
+                let job = $.trim($("#create-job").val());
+                // 邮箱
+                let email = $.trim($("#create-email").val());
+                // 公司座机
+                let phone = $.trim($("#create-phone").val());
+                // 公司网站
+                let website = $.trim($("#create-website").val());
+                // 手机
+                let mPhone = $.trim($("#create-mphone").val());
+                // 线索状态
+                let state = $("#create-state").val();
+                // 线索来源
+                let source = $("#create-source").val();
+                // 描述
+                let description = $.trim($("#create-description").val());
+                // 联系纪要
+                let contactSummary = $.trim($("#create-contactSummary").val());
+                // 下次联系时间
+                let nextContactTime = $.trim($("#create-nextContactTime").val());
+                // 地址
+                let address = $.trim($("#create-address").val());
+
+                // 表单验证
+                // 所有者 公司 姓名不能为空
+                if (owner === "") {
+                    alert("所有者不能为空!");
+                    return;
+                }
+                if (company === "") {
+                    alert("公司不能为空!");
+                    return;
+                }
+                if (fullName === "") {
+                    alert("姓名不能为空!");
+                    return;
+                }
+                // 邮箱 公司座机 公司网站 手机号不为空时, 验证其格式.
+                let emailRegExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+                if (email !== "" && !emailRegExp.test(email)) {
+                    alert("邮箱格式错误!");
+                    return;
+                }
+                let phoneRegExp = /0\d{2,3}-\d{7,8}/
+                if (phone !== "" && !phoneRegExp.test(phone)) {
+                    alert("公司座机格式错误!");
+                    return;
+                }
+                let websiteRegExp = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
+                if (website !== "" && !websiteRegExp.test(website)) {
+                    alert("公司网站格式错误!")
+                    return;
+                }
+                let mPhoneRegExp = /^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+                if (mPhone !== "" && !mPhoneRegExp.test(mPhone)) {
+                    alert("手机号格式错误!");
+                    return;
+                }
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/clue/saveCreateClue",
+                    type: "post",
+                    data: {
+                        fullName: fullName,
+                        appellation: appellation,
+                        owner: owner,
+                        company: company,
+                        job: job,
+                        email: email,
+                        phone: phone,
+                        website: website,
+                        mPhone: mPhone,
+                        state: state,
+                        source: source,
+                        description: description,
+                        contactSummary: contactSummary,
+                        nextContactTime: nextContactTime,
+                        address: address
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 成功
+                            $("#createClueModal").modal("hide");
+                            // 刷新线索列表
+                            queryClueByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                        } else {
+                            // 失败
+                            alert(resp.message);
+                        }
+                    }
+                })
+            })
+
+            // 时间选择期插件
+            $(".date-time").datetimepicker({
+                language: "zh-CN",
+                format: "yyyy-mm-dd",
+                minView: "month",
+                initialDate: new Date(),
+                autoclose: true,
+                todayBtn: true,
+                clearBtn: true
+            });
+
+            // 进入线索列表后, 默认展示第一页内容
+            queryClueByConditionForPage(1, 10);
+
+            // 为全选按钮添加单击事件
+            $("#check-all").click(function () {
+                $("#tBody input[type='checkbox']").prop("checked", this.checked);
+            });
+
+            // 为所有checkbox添加单击事件
+            $("#tBody").on("click", "input[type = 'checkbox']", function () {
+                if ($("#tBody input[type='checkbox']").size() ===
+                    $("#tBody input[type='checkbox']:checked").size()) {
+                    $("#check-all").prop("checked", true);
+                } else {
+                    $("#check-all").prop("checked", false);
+                }
+            });
+
+
+            // 查询按钮 单击事件
+            $("#query-clue-btn").click(function () {
+                queryClueByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+            })
+
+
+            // 修改按钮添加单击事件
+            $("#edit-clue-btn").click(function () {
+                let checkIds = $("#tBody input[type='checkbox']:checked");
+                if (checkIds.size() === 0) {
+                    alert("请选择需要修改的线索");
+                    return;
+                }
+                if (checkIds.size() > 1) {
+                    alert("一次只能修改一条线索");
+                    return;
+                }
+                let id = checkIds.val();
+                // 发送请求 获取参数 添加到修改模态窗口
+                $.ajax({
+                    url: "workbench/clue/queryClueById",
+                    type: "get",
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        $("#edit-id").val(resp.id);
+                        $('#edit-clueOwner').val(resp.owner);
+                        $("#edit-company").val(resp.company);
+                        $("#edit-appellation").val(resp.appellation);
+                        $("#edit-fullName").val(resp.fullName);
+                        $("#edit-job").val(resp.job);
+                        $("#edit-email").val(resp.email);
+                        $("#edit-phone").val(resp.phone);
+                        $("#edit-website").val(resp.website);
+                        $("#edit-mPhone").val(resp.mPhone);
+                        $("#edit-state").val(resp.state);
+                        $("#edit-source").val(resp.source);
+                        $("#edit-description").val(resp.description);
+                        $("#edit-contactSummary").val(resp.contactSummary);
+                        $("#edit-nextContactTime").val(resp.nextContactTime);
+                        $("#edit-address").val(resp.address);
+
+                        // 展示模态窗口
+                        $("#editClueModal").modal("show");
+                    }
+                })
+            });
+
+
+            // 修改模态窗口中的更新 单击事件
+            $("#save-edit-clue-btn").click(function () {
+                // 收集参数
+                // id
+                let id = $("#edit-id").val();
+                // 姓名 非空
+                let fullName = $.trim($("#edit-fullName").val());
+                // 称呼
+                let appellation = $("#edit-appellation").val();
+                // 所有者 非空
+                let owner = $("#edit-clueOwner").val();
+                // 公司 非空
+                let company = $.trim($("#edit-company").val());
+                // 职位
+                let job = $.trim($("#edit-job").val());
+                // 邮箱
+                let email = $.trim($("#edit-email").val());
+                // 公司座机
+                let phone = $.trim($("#edit-phone").val());
+                // 公司网站
+                let website = $.trim($("#edit-website").val());
+                // 手机
+                let mPhone = $.trim($("#edit-mPhone").val());
+                // 线索状态
+                let state = $("#edit-state").val();
+                // 线索来源
+                let source = $("#edit-source").val();
+                // 描述
+                let description = $.trim($("#edit-description").val());
+                // 联系纪要
+                let contactSummary = $.trim($("#edit-contactSummary").val());
+                // 下次联系时间
+                let nextContactTime = $.trim($("#edit-nextContactTime").val());
+                // 地址
+                let address = $.trim($("#edit-address").val());
+
+                // 表单验证
+                // 所有者 公司 姓名不能为空
+                if (owner === "") {
+                    alert("所有者不能为空!");
+                    return;
+                }
+                if (company === "") {
+                    alert("公司不能为空!");
+                    return;
+                }
+                if (fullName === "") {
+                    alert("姓名不能为空!");
+                    return;
+                }
+                // 邮箱 公司座机 公司网站 手机号不为空时, 验证其格式.
+                let emailRegExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+                if (email !== "" && !emailRegExp.test(email)) {
+                    alert("邮箱格式错误!");
+                    return;
+                }
+                let phoneRegExp = /0\d{2,3}-\d{7,8}/
+                if (phone !== "" && !phoneRegExp.test(phone)) {
+                    alert("公司座机格式错误!");
+                    return;
+                }
+                let websiteRegExp = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
+                if (website !== "" && !websiteRegExp.test(website)) {
+                    alert("公司网站错误!")
+                    return;
+                }
+                let mPhoneRegExp = /^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+                if (mPhone !== "" && !mPhoneRegExp.test(mPhone)) {
+                    alert("手机号格式错误!");
+                    return;
+                }
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/clue/saveEditClueById",
+                    type: "put",
+                    data: {
+                        id: id,
+                        fullName: fullName,
+                        appellation: appellation,
+                        owner: owner,
+                        company: company,
+                        job: job,
+                        email: email,
+                        phone: phone,
+                        website: website,
+                        mPhone: mPhone,
+                        state: state,
+                        source: source,
+                        description: description,
+                        contactSummary: contactSummary,
+                        nextContactTime: nextContactTime,
+                        address: address
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 成功 关闭模态窗口 刷新列表
+                            $("#editClueModal").modal("hide");
+                            queryClueByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                        } else {
+                            alert(resp.message);
+                        }
+                    }
+                });
+            })
+
+
+            // 删除按钮添加单击事件
+            $("#delete-clue-btn").click(function () {
+                let $checkedIds = $("#tBody input[type='checkbox']:checked");
+                if ($checkedIds.size() === 0) {
+                    alert("请选择要删除的市场活动");
+                    return;
+                }
+                if (window.confirm("确定删除?")) {
+                    let ids = "";
+                    $.each($checkedIds, function () {
+                        ids += "id=" + this.value + "&";
+                    });
+                    ids = ids.substr(0, ids.length - 1);
+
+                    // 发送请求
+                    $.ajax({
+                        url: "workbench/clue/deleteClueByIds",
+                        type: "delete",
+                        data: ids,
+                        dataType: "json",
+                        success: function (resp) {
+                            if (resp.status === "1") {
+                                // 刷新列表
+                                queryClueByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                            } else {
+                                alert(resp.message);
+                            }
+                        }
+                    })
+                }
+            })
+            // ======================================== 入口函数 end ========================================
+        });
+
+
+        // 分页展示
+        function queryClueByConditionForPage(pageNo, pageSize) {
+            // 收集参数
+            // 名称
+            let fullName = $.trim($("#query-fullname").val());
+            // 公司
+            let company = $.trim($("#query-company").val());
+            // 公司座机
+            let phone = $.trim($("#query-phone").val());
+            // 线索来源
+            let source = $("#query-source option:selected").text();
+            // 所有者
+            let owner = $.trim($("#query-owner").val());
+            // 手机
+            let mPhone = $.trim($("#query-mphone").val());
+            // 线索状态
+            let state = $("#query-clueState option:selected").text();
+
+            // 发送请求
+            $.ajax({
+                url: "workbench/clue/queryClueByConditionForPage",
+                type: "post",
+                data: {
+                    fullName: fullName,
+                    company: company,
+                    phone: phone,
+                    source: source,
+                    owner: owner,
+                    mPhone: mPhone,
+                    state: state,
+                    pageNo: pageNo,
+                    pageSize: pageSize
+                },
+                dataType: "json",
+                success: function (resp) {
+                    let htmlStr = "";
+                    $.each(resp.clueList, function (k, v) {
+                        // 拼接页面
+                        htmlStr += "<tr>";
+                        htmlStr += "<td><input type=\"checkbox\" value=\"" + v.id + "\"/></td>";
+                        htmlStr += "<td>";
+                        htmlStr += "<a style=\"text-decoration: none; cursor: pointer;\" onClick=\"window.location.href='workbench/clue/detail?id=" + v.id + "';\">";
+                        htmlStr += v.fullName + v.appellation + "</a>";
+                        htmlStr += "</td>";
+                        htmlStr += "<td>" + v.company + "</td>";
+                        htmlStr += "<td>" + v.phone + "</td>";
+                        htmlStr += "<td>" + v.mPhone + "</td>";
+                        htmlStr += "<td>" + v.source + "</td>";
+                        htmlStr += "<td>" + v.owner + "</td>";
+                        htmlStr += "<td>" + v.state + "</td>";
+                        htmlStr += "</tr>";
+                    })
+                    // 每次拼接页面时, 取消全选复选框
+                    $("#check-all").prop("checked", false);
+
+                    $("#tBody").html(htmlStr);
+
+                    // 计算总页数
+                    let totalPages = 1;
+                    totalPages = Math.ceil(resp.totalRows / pageSize); // 向上取整
+                    // 分页按钮
+                    $("#page").bs_pagination({
+                        currentPage: pageNo, // 当前页面pageNo
+                        rowsPerPage: pageSize, // 每页展示条数pageSize
+                        totalRows: resp.totalRows, // 总条数
+                        totalPages: totalPages, // 总页数
+                        visiblePageLinks: 5, // 最多展示卡片数
+                        showGoToPage: true, // 展示"跳转到"
+                        showRowsPerPage: true, // 展示"显示每页条数"
+                        showRowsInfo: true, // 展示"记录信息"
+                        onChangePage: function (event, pageObj) {
+                            // 用户每次切换页码, 都会触发此方法
+                            // 每次返回切换后页码的pageNo, pageSize
+                            queryClueByConditionForPage(pageObj.currentPage, pageObj.rowsPerPage);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+<!-- 创建线索的模态窗口 -->
+<div class="modal fade" id="createClueModal" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 90%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">创建线索</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="create-clue-form" role="form">
+                    <input id="edit-id" type="hidden">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-owner">所有者<span
+                                style="font-size: 15px; color: red;">*</span></label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="create-owner">
+                                <option th:each="user:${users}" th:text="${user.name}" th:value="${user.id}"></option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label" for="create-company">公司<span
+                                style="font-size: 15px; color: red;">*</span></label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-company" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-appellation">称呼</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="create-appellation">
+                                <option></option>
+                                <option th:each="appellation,status:${appellationList}" th:text="${appellation.value}"
+                                        th:value="${appellation.id}"></option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label" for="create-fullname">姓名<span
+                                style="font-size: 15px; color: red;">*</span></label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-fullname" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-job">职位</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-job" type="text">
+                        </div>
+                        <label class="col-sm-2 control-label" for="create-email">邮箱</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-email" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-phone">公司座机</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-phone" type="text">
+                        </div>
+                        <label class="col-sm-2 control-label" for="create-website">公司网站</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-website" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-mphone">手机</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="create-mphone" type="text">
+                        </div>
+                        <label class="col-sm-2 control-label" for="create-state">线索状态</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="create-state">
+                                <option></option>
+                                <option th:each="clueState:${clueStateList}" th:text="${clueState.value}"
+                                        th:value="${clueState.id}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-source">线索来源</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="create-source">
+                                <option></option>
+                                <option th:each="source:${sourceList}" th:text="${source.value}"
+                                        th:value="${source.id}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="create-description">线索描述</label>
+                        <div class="col-sm-10" style="width: 81%;">
+                            <textarea class="form-control" id="create-description" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative;"></div>
+
+                    <div style="position: relative;top: 15px;">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="create-contactSummary">联系纪要</label>
+                            <div class="col-sm-10" style="width: 81%;">
+                                <textarea class="form-control" id="create-contactSummary" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="create-nextContactTime">下次联系时间</label>
+                            <div class="col-sm-10" style="width: 300px;">
+                                <input class="form-control date-time" id="create-nextContactTime" readonly type="text">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative; top : 10px;"></div>
+
+                    <div style="position: relative;top: 20px;">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="create-address">详细地址</label>
+                            <div class="col-sm-10" style="width: 81%;">
+                                <textarea class="form-control" id="create-address" rows="1"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
+                <button class="btn btn-primary" id="save-clue-btn" type="button">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 修改线索的模态窗口 -->
+<div class="modal fade" id="editClueModal" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 90%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">修改线索</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-clueOwner">所有者<span
+                                style="font-size: 15px; color: red;">*</span></label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="edit-clueOwner">
+                                <option th:each="user:${users}" th:text="${user.name}" th:value="${user.id}"></option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label" for="edit-company">公司<span
+                                style="font-size: 15px; color: red;">*</span></label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-company" type="text" value="动力节点">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-appellation">称呼</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="edit-appellation">
+                                <option></option>
+                                <option th:each="appellation,status:${appellationList}" th:text="${appellation.value}"
+                                        th:value="${appellation.id}"></option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label" for="edit-fullName">姓名<span
+                                style="font-size: 15px; color: red;">*</span></label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-fullName" type="text" value="李四">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-job">职位</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-job" type="text" value="CTO">
+                        </div>
+                        <label class="col-sm-2 control-label" for="edit-email">邮箱</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-email" type="text" value="lisi@bjpowernode.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-phone">公司座机</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-phone" type="text" value="010-84846003">
+                        </div>
+                        <label class="col-sm-2 control-label" for="edit-website">公司网站</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-website" type="text"
+                                   value="http://www.bjpowernode.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-mPhone">手机</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <input class="form-control" id="edit-mPhone" type="text" value="12345678901">
+                        </div>
+                        <label class="col-sm-2 control-label" for="edit-state">线索状态</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="edit-state">
+                                <option></option>
+                                <option th:each="clueState:${clueStateList}" th:text="${clueState.value}"
+                                        th:value="${clueState.id}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-source">线索来源</label>
+                        <div class="col-sm-10" style="width: 300px;">
+                            <select class="form-control" id="edit-source">
+                                <option></option>
+                                <option th:each="source:${sourceList}" th:text="${source.value}"
+                                        th:value="${source.id}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-description">描述</label>
+                        <div class="col-sm-10" style="width: 81%;">
+                            <textarea class="form-control" id="edit-description" rows="3">这是一条线索的描述信息</textarea>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative;"></div>
+
+                    <div style="position: relative;top: 15px;">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="edit-contactSummary">联系纪要</label>
+                            <div class="col-sm-10" style="width: 81%;">
+                                <textarea class="form-control" id="edit-contactSummary" rows="3">这个线索即将被转换</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="edit-nextContactTime">下次联系时间</label>
+                            <div class="col-sm-10" style="width: 300px;">
+                                <input class="form-control date-time" id="edit-nextContactTime" readonly
+                                       type="text" value="2017-05-01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative; top : 10px;"></div>
+
+                    <div style="position: relative;top: 20px;">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="edit-address">详细地址</label>
+                            <div class="col-sm-10" style="width: 81%;">
+                                <textarea class="form-control" id="edit-address" rows="1">北京大兴区大族企业湾</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
+                <button class="btn btn-primary" id="save-edit-clue-btn" type="button">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div>
+    <div style="position: relative; left: 10px; top: -10px;">
+        <div class="page-header">
+            <h3>线索列表</h3>
+        </div>
+    </div>
+</div>
+
+<!-- 搜索 -->
+<div style="position: relative; top: -20px; left: 0; width: 100%; height: 100%;">
+    <div style="width: 100%; position: absolute;top: 5px; left: 10px;">
+        <div class="btn-toolbar" role="toolbar" style="height: 80px;">
+            <form class="form-inline" role="form" style="position: relative;top: 8%; left: 5px;">
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">名称</div>
+                        <input class="form-control" id="query-fullname" type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">公司</div>
+                        <input class="form-control" id="query-company" type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">公司座机</div>
+                        <input class="form-control" id="query-phone" type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">线索来源</div>
+                        <select class="form-control" id="query-source">
+                            <option></option>
+                            <option th:each="source:${sourceList}" th:text="${source.value}"
+                                    th:value="${source.id}"></option>
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">所有者</div>
+                        <input class="form-control" id="query-owner" type="text">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">手机</div>
+                        <input class="form-control" id="query-mphone" type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">线索状态</div>
+                        <select class="form-control" id="query-clueState">
+                            <option></option>
+                            <option th:each="clueState:${clueStateList}" th:text="${clueState.value}"
+                                    th:value="${clueState.id}"></option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-default" id="query-clue-btn" type="button">查询</button>
+
+            </form>
+        </div>
+
+        <div class="btn-toolbar" role="toolbar"
+             style="background-color: #F7F7F7; height: 50px; position: relative;top: 40px;">
+            <div class="btn-group" style="position: relative; top: 18%;">
+                <button class="btn btn-primary" id="create-clue-btn" type="button"><span
+                        class="glyphicon glyphicon-plus"></span> 创建
+                </button>
+                <button class="btn btn-default" id="edit-clue-btn" type="button"><span
+                        class="glyphicon glyphicon-pencil"></span> 修改
+                </button>
+                <button class="btn btn-danger" id="delete-clue-btn" type="button"><span
+                        class="glyphicon glyphicon-minus"></span> 删除
+                </button>
+            </div>
+
+
+        </div>
+        <div style="position: relative;top: 50px;">
+            <table class="table table-hover">
+                <thead>
+                <tr style="color: #B3B3B3;">
+                    <td><input id="check-all" type="checkbox"/></td>
+                    <td>名称</td>
+                    <td>公司</td>
+                    <td>公司座机</td>
+                    <td>手机</td>
+                    <td>线索来源</td>
+                    <td>所有者</td>
+                    <td>线索状态</td>
+                </tr>
+                </thead>
+                <tbody id="tBody">
+                <tr>
+                    <td><input type="checkbox"/></td>
+                    <td><a onclick="window.location.href='workbench/clue/detail';"
+                           style="text-decoration: none; cursor: pointer;">李四先生</a></td>
+                    <td>动力节点</td>
+                    <td>010-84846003</td>
+                    <td>12345678901</td>
+                    <td>广告</td>
+                    <td>zhangsan</td>
+                    <td>已联系</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"/></td>
+                    <td><a onclick="window.location.href='workbench/clue/detail';"
+                           style="text-decoration: none; cursor: pointer;">李四先生</a></td>
+                    <td>动力节点</td>
+                    <td>010-84846003</td>
+                    <td>12345678901</td>
+                    <td>广告</td>
+                    <td>zhangsan</td>
+                    <td>已联系</td>
+                </tr>
+                </tbody>
+            </table>
+            <div id="page"></div>
+        </div>
+        <!--<div style="height: 50px; position: relative;top: 60px;">
+            <div>
+                <button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
+            </div>
+            <div class="btn-group" style="position: relative;top: -34px; left: 110px;">
+                <button type="button" class="btn btn-default" style="cursor: default;">显示</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        10
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">20</a></li>
+                        <li><a href="#">30</a></li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
+            </div>
+            <div style="position: relative;top: -88px; left: 285px;">
+                <nav>
+                    <ul class="pagination">
+                        <li class="disabled"><a href="#">首页</a></li>
+                        <li class="disabled"><a href="#">上一页</a></li>
+                        <li class="active"><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#">下一页</a></li>
+                        <li class="disabled"><a href="#">末页</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>-->
+
+    </div>
+
+</div>
+</body>
+</html>

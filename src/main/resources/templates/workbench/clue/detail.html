@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+
+    <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <script src="jquery/jquery-1.11.1-min.js" type="text/javascript"></script>
+    <script src="jquery/bootstrap_3.3.0/js/bootstrap.min.js" type="text/javascript"></script>
+
+    <script th:inline="javascript">
+
+        //默认情况下取消和保存按钮是隐藏的
+        var cancelAndSaveBtnDefault = true;
+
+        $(function () {
+            // ============================================== 入口函数 start ==============================================
+
+            $("#remark").focus(function () {
+                if (cancelAndSaveBtnDefault) {
+                    //设置remarkDiv的高度为130px
+                    $("#remarkDiv").css("height", "130px");
+                    //显示
+                    $("#cancelAndSaveBtn").show("2000");
+                    cancelAndSaveBtnDefault = false;
+                }
+            });
+
+            $("#cancelBtn").click(function () {
+                //显示
+                $("#cancelAndSaveBtn").hide();
+                //设置remarkDiv的高度为130px
+                $("#remarkDiv").css("height", "90px");
+                cancelAndSaveBtnDefault = true;
+            });
+
+            $("#remarkDivList").on("mouseover", ".remarkDiv", function () {
+                $(this).children("div").children("div").show();
+            });
+
+
+            $("#remarkDivList").on("mouseout", ".remarkDiv", function () {
+                $(this).children("div").children("div").hide();
+            });
+
+            $("#remarkDivList").on("mouseover", ".myHref", function () {
+                $(this).children("span").css("color", "red");
+            });
+
+            $("#remarkDivList").on("mouseout", ".myHref", function () {
+                $(this).children("span").css("color", "#E6E6E6");
+            });
+
+
+            // 添加备注 保存 按钮添加 单击事件
+            $("#save-remark-btn").click(function () {
+                // 收集参数
+                let remark = $.trim($("#remark").val());
+                let clueId = [[${clue.id}]];
+                if (remark === "") {
+                    alert("备注不能为空!");
+                    return;
+                }
+                let imgTitle = [[${session.sessionUser.name}]];
+                let clueFullName = [[${clue.fullName}]];
+                let clueAppellation = [[${clue.appellation}]];
+                let clueCompany = [[${clue.company}]];
+                let username = [[${session.sessionUser.name}]];
+                // 发送请求 保存 线索备注 并刷新页面
+                $.ajax({
+                    url: "workbench/clue/remark/",
+                    type: "post",
+                    data: {
+                        noteContent: remark,
+                        clueId: clueId
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 清空备注输入框
+                            $("#remark").val("");
+                            // 刷新列表
+                            let htmlStr = "";
+                            htmlStr += "<div id=\"" + resp.retData.id + "\" class=\"remarkDiv\" style=\"height: 60px;\">";
+                            htmlStr += "<img title=\"" + imgTitle + "\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">";
+                            htmlStr += "<div style=\"position: relative; top: -40px; left: 40px;\">";
+                            htmlStr += "<h5>" + resp.retData.noteContent + "</h5>";
+                            htmlStr += "<font color=\"gray\">线索</font> <font color=\"gray\">-</font>";
+                            htmlStr += "<b> " + clueFullName + "" + clueAppellation + "-" + clueCompany + "</b>";
+                            htmlStr += "<small style=\"color: gray;\">";
+                            htmlStr += resp.retData.createTime + " 由 " + username + " 创建";
+                            htmlStr += "</small>";
+                            htmlStr += "<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
+                            htmlStr += "<a class=\"myHref edit-remark\" href=\"javascript:void(0);\" remarkId=\"" + resp.retData.id + "\">";
+                            htmlStr += "<span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span>";
+                            htmlStr += "</a>";
+                            htmlStr += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                            htmlStr += "<a class=\"myHref remove-remark\" href=\"javascript:void(0);\" remarkId=\"" + resp.retData.id + "\">";
+                            htmlStr += "<span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #E6E6E6;\"></span>";
+                            htmlStr += "</a>";
+                            htmlStr += "</div>";
+                            htmlStr += "</div>";
+                            htmlStr += "</div>";
+                            $("#remarkDiv").before(htmlStr);
+                        } else {
+                            alert(resp.message);
+                        }
+                    }
+                });
+            });
+
+
+            // 为所有删除按钮添加单击事件
+            $("#remarkDivList").on("click", ".remove-remark", function () {
+                // 获取参数
+                let remarkId = $(this).attr("remarkId");
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/clue/remark/",
+                    type: "delete",
+                    data: {
+                        id: remarkId
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 成功
+                            // 删除元素
+                            $("#" + remarkId).remove();
+                        } else {
+                            // 失败
+                            // 提示信息
+                            alert(resp.message);
+                        }
+                    }
+                })
+            });
+
+
+            // 为所有修改按钮添加单击事件
+            $("#remarkDivList").on("click", ".edit-remark", function () {
+                // 收集数据
+                let remarkId = $(this).attr("remarkId");
+                let noteContent = $("#" + remarkId + " h5").text();
+                // 将备注内容填写到模态窗口
+                $("#edit-noteContent").val(noteContent);
+                // 将id保存到隐藏区域中
+                $("#edit-id").val(remarkId);
+                // 弹出模态窗口
+                $("#editRemarkModal").modal("show");
+            });
+
+            // 为 修改模态窗口中的 更新按钮 添加单击事件
+            $("#updateRemarkBtn").click(function () {
+                // 收集数据
+                let noteContent = $.trim($("#edit-noteContent").val());
+                let editId = $("#edit-id").val();
+                if (noteContent === "") {
+                    alert("修改内容不能为空");
+                    return;
+                }
+
+                let username = [[${session.sessionUser.name}]];
+                // 发送请求
+                $.ajax({
+                    url: "workbench/clue/remark/",
+                    type: "put",
+                    data: {
+                        id: editId,
+                        noteContent: noteContent
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 关闭模态窗口
+                            $("#editRemarkModal").modal("hide");
+                            // 刷新备注列表
+                            $("#" + editId + " h5").text(resp.retData.noteContent);
+                            $("#" + editId + " small").text(" " + resp.retData.editTime + " 由 " + username + " 修改");
+                        } else {
+                            alert(resp.message);
+                        }
+                    }
+                });
+            });
+
+
+            // 为"关联市场活动"按钮添加单击事件
+            $("#bindActivity").click(function () {
+                // 初始化工作
+                $("#formBindModal").get(0).reset();
+                $("#tBody-bindModal").html("");
+                // 弹出线索 关联市场活动 模态窗口
+                $("#bindModal").modal("show");
+            })
+
+
+            // "关联市场活动" 中搜索框实现回车搜索
+            $("#query-activity").keydown(function (event) {
+                // alert(event.key);
+                if (event.key === 'Enter') {
+                    // 收集参数
+                    let activityName = this.value;
+                    let clueId = [[${clue.id}]];
+                    // 发送请求
+                    $.ajax({
+                        url: "workbench/clue/remark/AssociatedActivities",
+                        type: "get",
+                        data: {
+                            activityName: activityName,
+                            clueId: clueId
+                        },
+                        dataType: "json",
+                        success: function (resp) {
+                            let html = "";
+                            $.each(resp, function (i, v) {
+                                html += "<tr>";
+                                html += "<td><input value=\"" + v.id + "\" type=\"checkbox\"/></td>";
+                                html += "<td>" + v.name + "</td>";
+                                html += "<td>" + v.startDate + "</td>";
+                                html += "<td>" + v.endDate + "</td>";
+                                html += "<td>" + v.owner + "</td>";
+                                html += "</tr>";
+                            });
+                            // 响应到页面
+                            $("#tBody-bindModal").html(html);
+                        }
+                    })
+                }
+            })
+
+            // 关联按钮单击事件
+            $("#saveBindActivityBtn").click(function () {
+                // 收集参数 获取tBody-bindModal中所有被选中的checkbox
+                let $checked = $("#tBody-bindModal input[type='checkbox']:checked");
+
+                // 表单验证
+                if ($checked.size() === 0) {
+                    alert("请选择要关联的市场活动");
+                    return;
+                }
+                let req = "";
+                $.each($checked, function (i, v) {
+                    req += "activityId=" + this.value + "&";
+                });
+                req += "clueId=" + [[${clue.id}]];
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/clue/remark/AssociatedActivities",
+                    type: "post",
+                    data: req,
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 成功
+                            // 关闭模态窗口
+                            $("#bindModal").modal("hide");
+                            // 刷新关联的市场活动列表.
+                            let html = "";
+                            $.each(resp.retData, function (i, v) {
+                                html += "<tr>";
+                                html += "<td>" + v.name + "</td>";
+                                html += "<td>" + v.startDate + "</td>";
+                                html += "<td>" + v.endDate + "</td>";
+                                html += "<td>" + v.owner + "</td>";
+                                html += "<td>";
+                                html += "<a href=\"javascript:void(0);\" activityId=\"" + v.id + "\" style=\"text-decoration: none;\">";
+                                html += "<span class=\"glyphicon glyphicon-remove\"></span>";
+                                html += "解除关联";
+                                html += "</a>";
+                                html += "</td>";
+                                html += "</tr>";
+                            })
+                            $("#tBody-activity").append(html);
+                        } else {
+                            // 提示信息
+                            alert(resp.message);
+                            $("#bindModal").modal("show");
+                        }
+                    }
+                })
+            })
+
+            // 实现解除关联
+            $("#tBody-activity").on("click", "a", function () {
+                // 收集参数
+                let activityId = $(this).attr("activityId");
+                let clueId = [[${clue.id}]];
+                let tr = $(this).parent().parent();
+                // 发送请求
+                if (window.confirm("确定删除吗?")) {
+                    $.ajax({
+                        url: "workbench/clue/remark/AssociatedActivities",
+                        type: "delete",
+                        data: {
+                            activityId: activityId,
+                            clueId: clueId
+                        },
+                        dataType: "json",
+                        success: function (resp) {
+                            if (resp.status === "1") {
+                                // 成功
+                                tr.remove();
+                            } else {
+                                // 失败
+                                alert(resp.message);
+                            }
+                        }
+                    })
+                }
+            })
+            // ============================================== 入口函数 end ==============================================
+        });
+
+
+    </script>
+
+</head>
+<body>
+
+<!-- 修改市场活动备注的模态窗口 -->
+<div class="modal fade" id="editRemarkModal" role="dialog">
+    <!-- 备注的id -->
+    <input id="edit-id" type="hidden">
+    <div class="modal-dialog" role="document" style="width: 40%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">修改备注</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="edit-noteContent">内容</label>
+                        <div class="col-sm-10" style="width: 81%;">
+                            <textarea class="form-control" id="edit-noteContent" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
+                <button class="btn btn-primary" id="updateRemarkBtn" type="button">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 关联市场活动的模态窗口 -->
+<div class="modal fade" id="bindModal" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">关联市场活动</h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
+                    <form class="form-inline" id="formBindModal" role="form">
+                        <input style="display: none;" type="text">
+                        <div class="form-group has-feedback">
+                            <input class="form-control" id="query-activity" placeholder="请输入市场活动名称，支持模糊查询" style="width: 300px;"
+                                   type="text">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
+                    </form>
+                </div>
+                <table class="table table-hover" id="activityTable" style="width: 900px; position: relative;top: 10px;">
+                    <thead>
+                    <tr style="color: #B3B3B3;">
+                        <td><input type="checkbox"/></td>
+                        <td>名称</td>
+                        <td>开始日期</td>
+                        <td>结束日期</td>
+                        <td>所有者</td>
+                        <td></td>
+                    </tr>
+                    </thead>
+                    <tbody id="tBody-bindModal">
+                    <!--<tr>
+                        <td><input type="checkbox"/></td>
+                        <td>发传单</td>
+                        <td>2020-10-10</td>
+                        <td>2020-10-20</td>
+                        <td>zhangsan</td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox"/></td>
+                        <td>发传单</td>
+                        <td>2020-10-10</td>
+                        <td>2020-10-20</td>
+                        <td>zhangsan</td>
+                    </tr>-->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">取消</button>
+                <button class="btn btn-primary" id="saveBindActivityBtn" type="button">关联</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 返回按钮 -->
+<div style="position: relative; top: 35px; left: 10px;">
+    <a href="javascript:void(0);" onclick="window.history.back();"><span class="glyphicon glyphicon-arrow-left"
+                                                                         style="font-size: 20px; color: #DDDDDD"></span></a>
+</div>
+
+<!-- 大标题 -->
+<div style="position: relative; left: 40px; top: -30px;">
+    <div class="page-header">
+        <h3>[[${clue.fullName}]][[${clue.appellation}]] <small>动力节点</small></h3>
+    </div>
+    <div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
+        <button class="btn btn-default" onclick="window.location.href='convert.html';" type="button"><span
+                class="glyphicon glyphicon-retweet"></span> 转换
+        </button>
+
+    </div>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+<!-- 详细信息 -->
+<div style="position: relative; top: -70px;">
+    <div style="position: relative; left: 40px; height: 30px;">
+        <div style="width: 300px; color: gray;">名称</div>
+        <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>[[${clue.fullName}]][[${clue.appellation}]]&nbsp;</b>
+        </div>
+        <div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">所有者</div>
+        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>[[${clue.owner}]]&nbsp;</b>
+        </div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 10px;">
+        <div style="width: 300px; color: gray;">公司</div>
+        <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>[[${clue.company}]]&nbsp;</b>
+        </div>
+        <div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">职位</div>
+        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>[[${clue.job}]]&nbsp;</b></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 20px;">
+        <div style="width: 300px; color: gray;">邮箱</div>
+        <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>[[${clue.email}]]&nbsp;</b>
+        </div>
+        <div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">公司座机</div>
+        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>[[${clue.phone}]]&nbsp;</b></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 30px;">
+        <div style="width: 300px; color: gray;">公司网站</div>
+        <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>[[${clue.website}]]&nbsp;</b></div>
+        <div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">手机</div>
+        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>[[${clue.mPhone}]]&nbsp;</b></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 40px;">
+        <div style="width: 300px; color: gray;">线索状态</div>
+        <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>[[${clue.state}]]&nbsp;</b></div>
+        <div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">线索来源</div>
+        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>[[${clue.source}]]&nbsp;</b></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 50px;">
+        <div style="width: 300px; color: gray;">创建者</div>
+        <div style="width: 500px;position: relative; left: 200px; top: -20px;">
+            <b>[[${clue.createBy}]]&nbsp;&nbsp;</b><small
+                style="font-size: 10px; color: gray;">[[${clue.createTime}]]&nbsp;</small></div>
+        <div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 60px;">
+        <div style="width: 300px; color: gray;">修改者</div>
+        <div style="width: 500px;position: relative; left: 200px; top: -20px;">
+            <b>[[${clue.editBy}]]&nbsp;&nbsp;</b><small
+                style="font-size: 10px; color: gray;">[[${clue.editTime}]]&nbsp;</small></div>
+        <div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 70px;">
+        <div style="width: 300px; color: gray;">描述</div>
+        <div style="width: 630px;position: relative; left: 200px; top: -20px;">
+            <b>
+                [[${clue.description}]]&nbsp;
+            </b>
+        </div>
+        <div style="height: 1px; width: 850px; background: #D5D5D5; position: relative; top: -20px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 80px;">
+        <div style="width: 300px; color: gray;">联系纪要</div>
+        <div style="width: 630px;position: relative; left: 200px; top: -20px;">
+            <b>
+                [[${clue.contactSummary}]]&nbsp;
+            </b>
+        </div>
+        <div style="height: 1px; width: 850px; background: #D5D5D5; position: relative; top: -20px;"></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 90px;">
+        <div style="width: 300px; color: gray;">下次联系时间</div>
+        <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>[[${clue.nextContactTime}]]&nbsp;</b>
+        </div>
+        <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -20px; "></div>
+    </div>
+    <div style="position: relative; left: 40px; height: 30px; top: 100px;">
+        <div style="width: 300px; color: gray;">详细地址</div>
+        <div style="width: 630px;position: relative; left: 200px; top: -20px;">
+            <b>
+                [[${clue.address}]]&nbsp;
+            </b>
+        </div>
+        <div style="height: 1px; width: 850px; background: #D5D5D5; position: relative; top: -20px;"></div>
+    </div>
+</div>
+
+<!-- 备注 -->
+<div id="remarkDivList" style="position: relative; top: 40px; left: 40px;">
+    <div class="page-header">
+        <h4>备注</h4>
+    </div>
+
+    <div class="remarkDiv" style="height: 60px;" th:each="remark:${remarkList}" th:id="${remark.id}">
+        <img src="image/user-thumbnail.png" style="width: 30px; height:30px;" th:title="${remark.createBy}">
+        <div style="position: relative; top: -40px; left: 40px;">
+            <h5 th:text="${remark.noteContent}"></h5>
+            <font color="gray">线索</font> <font color="gray">-</font> <b>[[${clue.fullName}]][[${clue.appellation}]]-[[${clue.company}]]</b>
+            <small style="color: gray;">
+                [[${remark.editFlag == '1' ? remark.editTime : remark.createTime}]] 由
+                [[${remark.editFlag == '1' ? remark.editBy : remark.createBy}]]
+                [[${remark.editFlag == '1' ? '修改' : '创建'}]]
+            </small>
+            <div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+                <a class="myHref edit-remark" href="javascript:void(0);" th:attr="remarkId=${remark.id}">
+                    <span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span>
+                </a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="myHref remove-remark" href="javascript:void(0);" th:attr="remarkId=${remark.id}">
+                    <span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 备注1 -->
+    <!--<div class="remarkDiv" style="height: 60px;">
+        <img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
+        <div style="position: relative; top: -40px; left: 40px;">
+            <h5>哎呦！</h5>
+            <font color="gray">线索</font> <font color="gray">-</font> <b>李四先生-动力节点</b> <small style="color: gray;">
+            2017-01-22 10:10:10 由zhangsan</small>
+            <div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+                <a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit"
+                                                                   style="font-size: 20px; color: #E6E6E6;"></span></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove"
+                                                                   style="font-size: 20px; color: #E6E6E6;"></span></a>
+            </div>
+        </div>
+    </div>-->
+
+    <!-- 备注2 -->
+    <!--<div class="remarkDiv" style="height: 60px;">
+        <img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
+        <div style="position: relative; top: -40px; left: 40px;">
+            <h5>呵呵！</h5>
+            <font color="gray">线索</font> <font color="gray">-</font> <b>李四先生-动力节点</b> <small style="color: gray;">
+            2017-01-22 10:20:10 由zhangsan</small>
+            <div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+                <a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit"
+                                                                   style="font-size: 20px; color: #E6E6E6;"></span></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove"
+                                                                   style="font-size: 20px; color: #E6E6E6;"></span></a>
+            </div>
+        </div>
+    </div>-->
+
+    <div id="remarkDiv" style="background-color: #E6E6E6; width: 870px; height: 90px;">
+        <form role="form" style="position: relative;top: 10px; left: 10px;">
+            <textarea class="form-control" id="remark" placeholder="添加备注..." rows="2"
+                      style="width: 850px; resize : none;"></textarea>
+            <p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
+                <button class="btn btn-default" id="cancelBtn" type="button">取消</button>
+                <button class="btn btn-primary" id="save-remark-btn" type="button">保存</button>
+            </p>
+        </form>
+    </div>
+
+</div>
+
+<!-- 市场活动 -->
+<div>
+    <div style="position: relative; top: 60px; left: 40px;">
+        <div class="page-header">
+            <h4>市场活动</h4>
+        </div>
+        <div style="position: relative;top: 0px;">
+            <table class="table table-hover" style="width: 900px;">
+                <thead>
+                <tr style="color: #B3B3B3;">
+                    <td>名称</td>
+                    <td>开始日期</td>
+                    <td>结束日期</td>
+                    <td>所有者</td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody id="tBody-activity">
+                <tr th:each="activity:${activityList}">
+                    <td th:text="${activity.name}">发传单</td>
+                    <td th:text="${activity.startDate}">2020-10-10</td>
+                    <td th:text="${activity.endDate}">2020-10-20</td>
+                    <td th:text="${activity.owner}">zhangsan</td>
+                    <td>
+                        <a href="javascript:void(0);" style="text-decoration: none;"
+                           th:attr="activityId=${activity.id}"><span class="glyphicon glyphicon-remove"></span>
+                            解除关联
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <a href="javascript:void(0);" id="bindActivity" style="text-decoration: none;"><span
+                    class="glyphicon glyphicon-plus"></span>关联市场活动</a>
+        </div>
+    </div>
+</div>
+
+
+<div style="height: 200px;"></div>
+</body>
+</html>

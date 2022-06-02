@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base th:href="@{/}">
+    <meta charset="UTF-8">
+
+    <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" rel="stylesheet"
+          type="text/css"/>
+
+    <script src="jquery/jquery-1.11.1-min.js" type="text/javascript"></script>
+    <script src="jquery/bootstrap_3.3.0/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"
+            type="text/javascript"></script>
+    <script src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"
+            type="text/javascript"></script>
+
+</head>
+<body>
+
+<!-- 查找市场活动 -->
+<div class="modal fade" id="findMarketActivity" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">查找市场活动</h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
+                    <form class="form-inline" role="form">
+                        <div class="form-group has-feedback">
+                            <input class="form-control" placeholder="请输入市场活动名称，支持模糊查询" style="width: 300px;"
+                                   type="text">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
+                    </form>
+                </div>
+                <table class="table table-hover" id="activityTable3"
+                       style="width: 900px; position: relative;top: 10px;">
+                    <thead>
+                    <tr style="color: #B3B3B3;">
+                        <td></td>
+                        <td>名称</td>
+                        <td>开始日期</td>
+                        <td>结束日期</td>
+                        <td>所有者</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><input name="activity" type="radio"/></td>
+                        <td>发传单</td>
+                        <td>2020-10-10</td>
+                        <td>2020-10-20</td>
+                        <td>zhangsan</td>
+                    </tr>
+                    <tr>
+                        <td><input name="activity" type="radio"/></td>
+                        <td>发传单</td>
+                        <td>2020-10-10</td>
+                        <td>2020-10-20</td>
+                        <td>zhangsan</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 查找联系人 -->
+<div class="modal fade" id="findContacts" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">查找联系人</h4>
+            </div>
+            <div class="modal-body">
+                <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
+                    <form class="form-inline" role="form">
+                        <div class="form-group has-feedback">
+                            <input class="form-control" placeholder="请输入联系人名称，支持模糊查询" style="width: 300px;" type="text">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
+                    </form>
+                </div>
+                <table class="table table-hover" id="activityTable" style="width: 900px; position: relative;top: 10px;">
+                    <thead>
+                    <tr style="color: #B3B3B3;">
+                        <td></td>
+                        <td>名称</td>
+                        <td>邮箱</td>
+                        <td>手机</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><input name="activity" type="radio"/></td>
+                        <td>李四</td>
+                        <td>lisi@bjpowernode.com</td>
+                        <td>12345678901</td>
+                    </tr>
+                    <tr>
+                        <td><input name="activity" type="radio"/></td>
+                        <td>李四</td>
+                        <td>lisi@bjpowernode.com</td>
+                        <td>12345678901</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="position:  relative; left: 30px;">
+    <h3>修改交易</h3>
+    <div style="position: relative; top: -40px; left: 70%;">
+        <button class="btn btn-primary" type="button">保存</button>
+        <button class="btn btn-default" type="button">取消</button>
+    </div>
+    <hr style="position: relative; top: -40px;">
+</div>
+<form class="form-horizontal" role="form" style="position: relative; top: -30px;">
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-transactionOwner">所有者<span
+                style="font-size: 15px; color: red;">*</span></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <select class="form-control" id="create-transactionOwner">
+                <option>zhangsan</option>
+                <option>lisi</option>
+                <option>wangwu</option>
+            </select>
+        </div>
+        <label class="col-sm-2 control-label" for="create-amountOfMoney">金额</label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-amountOfMoney" type="text">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-transactionName">名称<span style="font-size: 15px; color: red;">*</span></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-transactionName" type="text">
+        </div>
+        <label class="col-sm-2 control-label" for="create-expectedClosingDate">预计成交日期<span
+                style="font-size: 15px; color: red;">*</span></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-expectedClosingDate" type="text">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-accountName">客户名称<span
+                style="font-size: 15px; color: red;">*</span></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-accountName" placeholder="支持自动补全，输入客户不存在则新建" type="text">
+        </div>
+        <label class="col-sm-2 control-label" for="create-transactionStage">阶段<span
+                style="font-size: 15px; color: red;">*</span></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <select class="form-control" id="create-transactionStage">
+                <option></option>
+                <option>资质审查</option>
+                <option>需求分析</option>
+                <option>价值建议</option>
+                <option>确定决策者</option>
+                <option>提案/报价</option>
+                <option>谈判/复审</option>
+                <option>成交</option>
+                <option>丢失的线索</option>
+                <option>因竞争丢失关闭</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-transactionType">类型</label>
+        <div class="col-sm-10" style="width: 300px;">
+            <select class="form-control" id="create-transactionType">
+                <option></option>
+                <option>已有业务</option>
+                <option>新业务</option>
+            </select>
+        </div>
+        <label class="col-sm-2 control-label" for="create-possibility">可能性</label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-possibility" type="text">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-clueSource">来源</label>
+        <div class="col-sm-10" style="width: 300px;">
+            <select class="form-control" id="create-clueSource">
+                <option></option>
+                <option>广告</option>
+                <option>推销电话</option>
+                <option>员工介绍</option>
+                <option>外部介绍</option>
+                <option>在线商场</option>
+                <option>合作伙伴</option>
+                <option>公开媒介</option>
+                <option>销售邮件</option>
+                <option>合作伙伴研讨会</option>
+                <option>内部研讨会</option>
+                <option>交易会</option>
+                <option>web下载</option>
+                <option>web调研</option>
+                <option>聊天</option>
+            </select>
+        </div>
+        <label class="col-sm-2 control-label" for="create-activitySrc">市场活动源&nbsp;&nbsp;<a data-target="#findMarketActivity"
+                                                                                           data-toggle="modal"
+                                                                                           href="javascript:void(0);"><span
+                class="glyphicon glyphicon-search"></span></a></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-activitySrc" type="text">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-contactsName">联系人名称&nbsp;&nbsp;<a data-target="#findContacts"
+                                                                                            data-toggle="modal"
+                                                                                            href="javascript:void(0);"><span
+                class="glyphicon glyphicon-search"></span></a></label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-contactsName" type="text">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-describe">描述</label>
+        <div class="col-sm-10" style="width: 70%;">
+            <textarea class="form-control" id="create-describe" rows="3"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-contactSummary">联系纪要</label>
+        <div class="col-sm-10" style="width: 70%;">
+            <textarea class="form-control" id="create-contactSummary" rows="3"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="create-nextContactTime">下次联系时间</label>
+        <div class="col-sm-10" style="width: 300px;">
+            <input class="form-control" id="create-nextContactTime" type="text">
+        </div>
+    </div>
+
+</form>
+</body>
+</html>
