@@ -311,6 +311,28 @@
                     })
                 }
             })
+
+            // 实现搜索模态窗口中全选按钮功能
+            $("#checkAll").click(function () {
+                $("#tBody-bindModal input[type='checkbox']").prop("checked", this.checked);
+            })
+
+            // 实现所有check单击事件
+            $("#tBody-bindModal").on("click", "input[type='checkbox']", function () {
+                if ($("#tBody-bindModal input[type='checkbox']").size() ===
+                    $("#tBody-bindModal input[type='checkbox']:checked").size()) {
+                    $("#checkAll").prop("checked", true);
+                } else {
+                    $("#checkAll").prop("checked", false);
+                }
+            })
+
+            // 实现转换跳转功能
+            $("#convertBtn").click(function () {
+                let clueId = [[${clue.id}]];
+                let url = "workbench/clue/convert?id=" + clueId;
+                window.location.href = url;
+            })
             // ============================================== 入口函数 end ==============================================
         });
 
@@ -365,7 +387,8 @@
                     <form class="form-inline" id="formBindModal" role="form">
                         <input style="display: none;" type="text">
                         <div class="form-group has-feedback">
-                            <input class="form-control" id="query-activity" placeholder="请输入市场活动名称，支持模糊查询" style="width: 300px;"
+                            <input class="form-control" id="query-activity" placeholder="请输入市场活动名称，支持模糊查询"
+                                   style="width: 300px;"
                                    type="text">
                             <span class="glyphicon glyphicon-search form-control-feedback"></span>
                         </div>
@@ -374,7 +397,7 @@
                 <table class="table table-hover" id="activityTable" style="width: 900px; position: relative;top: 10px;">
                     <thead>
                     <tr style="color: #B3B3B3;">
-                        <td><input type="checkbox"/></td>
+                        <td><input type="checkbox" id="checkAll"></td>
                         <td>名称</td>
                         <td>开始日期</td>
                         <td>结束日期</td>
@@ -421,8 +444,8 @@
         <h3>[[${clue.fullName}]][[${clue.appellation}]] <small>动力节点</small></h3>
     </div>
     <div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
-        <button class="btn btn-default" onclick="window.location.href='convert.html';" type="button"><span
-                class="glyphicon glyphicon-retweet"></span> 转换
+        <button class="btn btn-default" type="button" id="convertBtn">
+            <span class="glyphicon glyphicon-retweet"></span> 转换
         </button>
 
     </div>
@@ -642,7 +665,6 @@
         </div>
     </div>
 </div>
-
 
 <div style="height: 200px;"></div>
 </body>
