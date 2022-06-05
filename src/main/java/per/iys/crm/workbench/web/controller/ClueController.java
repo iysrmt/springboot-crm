@@ -182,4 +182,17 @@ public class ClueController {
         model.addAttribute("activityList", activityList);
         return "workbench/clue/detail";
     }
+
+    // 跳转到线索转换页
+    @GetMapping("/convert")
+    public String convert(Model model, String id) {
+        // 调用service层方法, 查询线索明细信息
+        Clue clue = clueService.queryClueForDetailById(id);
+        List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
+        // 把数据保存到作用域中
+        model.addAttribute("clue", clue);
+        model.addAttribute("stageList", stageList);
+        // 请求转发
+        return "workbench/clue/convert";
+    }
 }
