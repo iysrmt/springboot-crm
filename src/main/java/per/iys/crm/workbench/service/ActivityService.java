@@ -110,4 +110,12 @@ public interface ActivityService {
      * @return
      */
     List<Activity> queryActivityForDetailByIds(String[] ids);
+
+    /**
+     * 根据activityName模糊查询 且 与clueId关联过的市场活动
+     *
+     * @param map key属性名: activityName, clueId
+     * @return
+     */
+    List<Activity> queryActivityForConvertByNameClueId(Map<String, Object> map);
 }

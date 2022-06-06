@@ -183,6 +183,7 @@ public class ClueController {
         return "workbench/clue/detail";
     }
 
+
     // 跳转到线索转换页
     @GetMapping("/convert")
     public String convert(Model model, String id) {
@@ -194,5 +195,18 @@ public class ClueController {
         model.addAttribute("stageList", stageList);
         // 请求转发
         return "workbench/clue/convert";
+    }
+
+
+    //
+    @ResponseBody
+    @GetMapping("/convert/search")
+    public Object queryActivityForConvertByNameClueId(String activityName, String clueId) {
+        // 封装参数
+        Map<String, Object> map = new HashMap<>();
+        map.put("activityName", activityName);
+        map.put("clueId", clueId);
+        List<Activity> activityList = activityService.queryActivityForConvertByNameClueId(map);
+        return activityList;
     }
 }

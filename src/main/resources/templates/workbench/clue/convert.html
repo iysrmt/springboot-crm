@@ -15,8 +15,10 @@
     <script src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"
             type="text/javascript"></script>
 
-    <script type="text/javascript">
+    <script th:inline="javascript">
         $(function () {
+            // ========== 入口函数 start ==========
+
             $("#isCreateTransaction").click(function () {
                 if (this.checked) {
                     $("#create-transaction2").show(200);
@@ -24,6 +26,49 @@
                     $("#create-transaction2").hide(200);
                 }
             });
+
+
+            // 实现市场活动源功能
+            $("#searchActivityBtn").click(function () {
+                // 清空表单中的数据
+                $("#searchActivityForm").get(0).reset();
+                // 弹出模态窗口
+                $("#searchActivityModal").modal("show");
+            })
+
+            // 实现市场活动源搜索框功能
+            $("#searchActivityText").keydown(function (event) {
+                if (event.key === "Enter") {
+                    // 收集参数
+                    let activityName = this.value;
+                    let clueId = [[${clue.id}]];
+                    // 发送请求
+                    $.ajax({
+                        url: "workbench/clue/convert/search",
+                        type: "get",
+                        data: {
+                            activityName: activityName,
+                            clueId: clueId
+                        },
+                        dataType: "json",
+                        success: function (resp) {
+                            let html = "";
+                            $.each(resp, function (i, v) {
+                                html += "<tr>";
+                                html += "<td><input name=\"activity\" type=\"radio\" activityName=\"" + v.name + "\" value=\"" + v.id + "\"></td>";
+                                html += "<td>" + v.name + "</td>";
+                                html += "<td>" + v.startDate + "</td>";
+                                html += "<td>" + v.endDate + "</td>";
+                                html += "<td>" + v.owner + "</td>";
+                                html += "</tr>";
+                            });
+                            $("#searchActivityModalTbody").html(html);
+                        }
+
+                    })
+                }
+            })
+            // ========== 入口函数 end ==========
         });
     </script>
 
@@ -42,11 +87,13 @@
             </div>
             <div class="modal-body">
                 <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
-                    <form class="form-inline" role="form">
+                    <form class="form-inline" role="form" id="searchActivityForm">
                         <input type="text" style="display: none;">
                         <input type="hidden" id="activityId">
                         <div class="form-group has-feedback">
-                            <input class="form-control" placeholder="请输入市场活动名称，支持模糊查询" style="width: 300px;" type="text">
+                            <input id="searchActivityText" class="form-control" placeholder="请输入市场活动名称，支持模糊查询"
+                                   style="width: 300px;"
+                                   type="text">
                             <span class="glyphicon glyphicon-search form-control-feedback"></span>
                         </div>
                     </form>
@@ -62,8 +109,8 @@
                         <td></td>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
+                    <tbody id="searchActivityModalTbody">
+                    <!--<tr>
                         <td><input name="activity" type="radio"/></td>
                         <td>发传单</td>
                         <td>2020-10-10</td>
@@ -76,7 +123,7 @@
                         <td>2020-10-10</td>
                         <td>2020-10-20</td>
                         <td>zhangsan</td>
-                    </tr>
+                    </tr>-->
                     </tbody>
                 </table>
             </div>
@@ -121,9 +168,12 @@
             </select>
         </div>
         <div class="form-group" style="width: 400px;position: relative; left: 20px;">
-            <label for="activity">市场活动源&nbsp;&nbsp;<a data-target="#searchActivityModal" data-toggle="modal"
-                                                      href="javascript:void(0);" style="text-decoration: none;"><span
-                    class="glyphicon glyphicon-search"></span></a></label>
+            <label for="activity">市场活动源&nbsp;&nbsp;
+                <a id="searchActivityBtn" href="javascript:void(0);"
+                   style="text-decoration: none;">
+                    <span class="glyphicon glyphicon-search"></span>
+                </a>
+            </label>
             <input class="form-control" id="activity" placeholder="点击上面搜索" readonly type="text">
         </div>
     </form>
