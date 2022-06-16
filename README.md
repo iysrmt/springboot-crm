@@ -145,33 +145,118 @@
 
 - 使用mybatis逆向工程:
 
-  - 创建Maven工程: crm-mybatis-generator
+  - 创建Maven工程: mybatis-generator
 
   - 添加Maven插件
 
-    - ```xml
-      <build>
-          <plugins>
-              <plugin>
-                  <!--  https://mvnrepository.com/artifact/org.mybatis.generator/mybatis-generator-maven-plugin  -->
-                  <groupId>org.mybatis.generator</groupId>
-                  <artifactId>mybatis-generator-maven-plugin</artifactId>
-                  <version>1.4.1</version>
-                  <dependencies>
-                      <dependency>
-                          <groupId>mysql</groupId>
-                          <artifactId>mysql-connector-java</artifactId>
-                          <version>8.0.28</version>
-                      </dependency>
-                  </dependencies>
-                  <configuration>
-                      <verbose>true</verbose>
-                      <overwrite>true</overwrite>
-                  </configuration>
-              </plugin>
-          </plugins>
-      </build>
-      ```
+    ```xml
+    <build>
+        <plugins>
+            <plugin>
+                <!--  https://mvnrepository.com/artifact/org.mybatis.generator/mybatis-generator-maven-plugin  -->
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.4.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>8.0.29</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <verbose>true</verbose>
+                    <overwrite>true</overwrite>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    ```
+  
+  - 添加文件src/main/java/resources/generatorConfig.xml
+  
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE generatorConfiguration
+            PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+            "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+    
+    <generatorConfiguration>
+        
+        <properties resource="generator.properties"/>
+        
+        <!--
+            context标签
+                targetRuntime属性
+                    MyBatis3DynamicSql属性值
+                        默认, 可忽略. 生成注解方式的接口, 会忽略javaClientGenerator标签的type值
+                    MyBatis3Kotlin属性值
+                        以Kotlin语言生成, 具体生成同上 
+                    MyBatis3属性值
+                        生成动态sql的CRUD
+                    MyBatisSimple属性值
+                        生成5个最基本的CRUD方法
+        -->
+        <context id="MysqlTables" targetRuntime="MyBatis3Simple">
+            <jdbcConnection driverClass="${jdbc.driverClass}"
+                            connectionURL="${jdbc.connectionURL}"
+                            userId="${jdbc.userId}"
+                            password="${jdbc.password}">
+                <property name="nullCatalogMeansCurrent" value="true"/>
+            </jdbcConnection>
+    
+            <javaTypeResolver>
+                <property name="forceBigDecimals" value="false"/>
+            </javaTypeResolver>
+    
+            <!-- 实体类 -->
+            <javaModelGenerator targetPackage="org.example.domain" targetProject="../crm/src/main/java">
+                <property name="enableSubPackages" value="true"/>
+                <property name="trimStrings" value="true"/>
+            </javaModelGenerator>
+    
+            <!-- mapper接口 -->
+            <sqlMapGenerator targetPackage="org.example.mapper" targetProject="../crm/src/main/resources">
+                <property name="enableSubPackages" value="true"/>
+            </sqlMapGenerator>
+    
+            <!--
+                javaClientGenerator标签
+                    type属性
+                        ANNOTATEDMAPPER属性值
+    						生成注解类型 mapper
+                        XMLMAPPER属性值
+    						生成xml文件类型 mapper
+            -->
+            <javaClientGenerator type="XMLMAPPER" targetPackage="org.example.mapper" targetProject="../crm/src/main/java">
+                <property name="enableSubPackages" value="true"/>
+            </javaClientGenerator>
+    
+            <!--
+                table标签
+                    tableName属性
+    					数据表名
+                    domainObjectName属性
+    					实体类名
+            -->
+            <table tableName="tbl_table" domainObjectName="Table"
+                   enableCountByExample="false" enableUpdateByExample="false"
+                   enableDeleteByExample="false" enableSelectByExample="false"
+                   selectByExampleQueryId="false"/>
+            
+        </context>
+    
+    </generatorConfiguration>
+    ```
+  
+  - 添加文件src/main/java/resources/generator.properties
+  
+    ```properties
+    jdbc.driverClass=com.mysql.cj.jdbc.Driver
+    jdbc.connectionURL=jdbc:mysql://localhost:3306/crm
+    jdbc.userId=root
+    jdbc.password=root
+    ```
   
   - 添加数据库连接信息, 代码保存目录, 表的信息.
 
