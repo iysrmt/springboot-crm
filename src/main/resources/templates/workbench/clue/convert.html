@@ -64,10 +64,22 @@
                             });
                             $("#searchActivityModalTbody").html(html);
                         }
-
                     })
                 }
             })
+
+            // 实现市场活动源单选按钮功能
+            $("#searchActivityModalTbody").on("click", "input[type='radio']", function () {
+                // 收集参数
+                let id = this.value;
+                let activityName = $(this).attr("activityName");
+                // 设置参数
+                $("#activityId").val(id);
+                $("#activityName").val(activityName);
+                // 关闭模态窗口
+                $("#searchActivityModal").modal("hide");
+            })
+
             // ========== 入口函数 end ==========
         });
     </script>
@@ -89,7 +101,6 @@
                 <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
                     <form class="form-inline" role="form" id="searchActivityForm">
                         <input type="text" style="display: none;">
-                        <input type="hidden" id="activityId">
                         <div class="form-group has-feedback">
                             <input id="searchActivityText" class="form-control" placeholder="请输入市场活动名称，支持模糊查询"
                                    style="width: 300px;"
@@ -168,13 +179,14 @@
             </select>
         </div>
         <div class="form-group" style="width: 400px;position: relative; left: 20px;">
-            <label for="activity">市场活动源&nbsp;&nbsp;
+            <label for="activityName">市场活动源&nbsp;&nbsp;
                 <a id="searchActivityBtn" href="javascript:void(0);"
                    style="text-decoration: none;">
                     <span class="glyphicon glyphicon-search"></span>
                 </a>
             </label>
-            <input class="form-control" id="activity" placeholder="点击上面搜索" readonly type="text">
+            <input type="hidden" id="activityId">
+            <input class="form-control" id="activityName" placeholder="点击上面搜索" readonly type="text">
         </div>
     </form>
 
