@@ -23,6 +23,7 @@
                 if (this.checked) {
                     $("#create-transaction2").show(200);
                 } else {
+                    $("#convertClueFrom").get(0).reset();
                     $("#create-transaction2").hide(200);
                 }
             });
@@ -79,6 +80,67 @@
                 // 关闭模态窗口
                 $("#searchActivityModal").modal("hide");
             })
+
+            // 实现转换按钮功能
+            $("#saveConvertClue").click(function () {
+
+                // 收集参数
+                let clueId = [[${clue.id}]];
+                let money;
+                let name;
+                let expectedDate;
+                let stage;
+                let activityId;
+                let isCreateTran = $("#isCreateTransaction").prop("checked");
+
+                if (isCreateTran) {
+                    money = $.trim($("#amountOfMoney").val());
+                    name = $.trim($("#tradeName").val());
+                    expectedDate = $("#expectedClosingDate").val();
+                    stage = $("#stage").val();
+                    activityId = $("#activityId").val();
+                    // 数据验证
+                    let regExp = /^\d+$/;
+                    if (!regExp.test(money)) {
+                        alert("金额只能是非负整数!")
+                        return;
+                    }
+                }
+                // 发送请求
+                $.ajax({
+                    url: "workbench/clue/convert/convertClue",
+                    type: "post",
+                    data: {
+                        clueId: clueId,
+                        money: money,
+                        name: name,
+                        expectedDate: expectedDate,
+                        stage: stage,
+                        activityId: activityId,
+                        isCreateTran: isCreateTran
+                    },
+                    dataType: "json",
+                    success: resp => {
+                        if (resp.status === "1") {
+                            // 成功, 跳转到线索主页面
+                            window.location.href = "workbench/clue/";
+                        } else {
+                            // 失败, 提示信息
+                            alert(resp.message);
+                        }
+                    }
+                })
+            })
+
+            $(".date-time").datetimepicker({
+                language: "zh-CN",
+                format: "yyyy-mm-dd",
+                minView: "month",
+                initialDate: new Date(),
+                autoclose: true,
+                todayBtn: true,
+                clearBtn: true
+            });
 
             // ========== 入口函数 end ==========
         });
@@ -158,7 +220,7 @@
 <div id="create-transaction2"
      style="position: relative; left: 40px; top: 20px; width: 80%; background-color: #F7F7F7; display: none;">
 
-    <form>
+    <form id="convertClueFrom">
         <div class="form-group" style="width: 400px; position: relative; left: 20px;">
             <label for="amountOfMoney">金额</label>
             <input class="form-control" id="amountOfMoney" type="text">
@@ -169,7 +231,7 @@
         </div>
         <div class="form-group" style="width: 400px;position: relative; left: 20px;">
             <label for="expectedClosingDate">预计成交日期</label>
-            <input class="form-control" id="expectedClosingDate" type="text">
+            <input class="form-control date-time" id="expectedClosingDate" type="text" readonly>
         </div>
         <div class="form-group" style="width: 400px;position: relative; left: 20px;">
             <label for="stage">阶段</label>
@@ -197,7 +259,7 @@
     <b>[[${clue.owner}]]</b>
 </div>
 <div id="operation" style="position: relative; left: 40px; height: 35px; top: 100px;">
-    <input class="btn btn-primary" type="button" value="转换">
+    <input class="btn btn-primary" type="button" value="转换" id="saveConvertClue">
     &nbsp;&nbsp;&nbsp;&nbsp;
     <input class="btn btn-default" type="button" value="取消">
 </div>

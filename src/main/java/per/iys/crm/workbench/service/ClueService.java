@@ -62,4 +62,11 @@ public interface ClueService {
      * @return 线索
      */
     Clue queryClueForDetailById(String id);
+
+    /**
+     * 转换市场活动
+     *
+     * @param map key: clueId, sessionUser, tran, isCreateTran
+     */
+    void saveCovertClue(Map<String, Object> map);
 }

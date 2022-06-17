@@ -10,10 +10,7 @@ import per.iys.crm.commons.utils.DateUtils;
 import per.iys.crm.commons.utils.UUIDUtils;
 import per.iys.crm.settings.domain.User;
 import per.iys.crm.settings.service.UserService;
-import per.iys.crm.workbench.domain.Activity;
-import per.iys.crm.workbench.domain.Clue;
-import per.iys.crm.workbench.domain.ClueRemark;
-import per.iys.crm.workbench.domain.DicValue;
+import per.iys.crm.workbench.domain.*;
 import per.iys.crm.workbench.service.ActivityService;
 import per.iys.crm.workbench.service.ClueRemarkService;
 import per.iys.crm.workbench.service.ClueService;
@@ -208,5 +205,29 @@ public class ClueController {
         map.put("clueId", clueId);
         List<Activity> activityList = activityService.queryActivityForConvertByNameClueId(map);
         return activityList;
+    }
+
+    @ResponseBody
+    @PostMapping("/convert/convertClue")
+    public Object convertClue(HttpSession session, String clueId, Tran tran, String isCreateTran) {
+        ReturnObject returnObject = new ReturnObject();
+        // 封装参数
+        Map<String, Object> map = new HashMap<>();
+        map.put("clueId", clueId);
+        map.put("tran", tran);
+        map.put("isCreateTran", isCreateTran);
+        map.put(Constants.SESSION_USER, session.getAttribute(Constants.SESSION_USER));
+
+        try {
+            // 调用service方法, 保存线索转换
+            clueService.saveCovertClue(map);
+            returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+            returnObject.setMessage("系统繁忙, 请稍后重试...");
+        }
+
+        return returnObject;
     }
 }
