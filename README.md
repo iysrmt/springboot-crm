@@ -197,7 +197,7 @@
                     MyBatisSimple属性值
                         生成5个最基本的CRUD方法
         -->
-        <context id="MysqlTables" targetRuntime="MyBatis3Simple">
+        <context id="MysqlTables" targetRuntime="MyBatis3">
             <jdbcConnection driverClass="${jdbc.driverClass}"
                             connectionURL="${jdbc.connectionURL}"
                             userId="${jdbc.userId}"
