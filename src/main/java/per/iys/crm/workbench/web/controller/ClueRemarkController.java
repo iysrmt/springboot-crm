@@ -2,7 +2,6 @@ package per.iys.crm.workbench.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import per.iys.crm.commons.constants.Constants;
 import per.iys.crm.commons.domain.ReturnObject;
@@ -10,13 +9,11 @@ import per.iys.crm.commons.utils.DateUtils;
 import per.iys.crm.commons.utils.UUIDUtils;
 import per.iys.crm.settings.domain.User;
 import per.iys.crm.workbench.domain.Activity;
-import per.iys.crm.workbench.domain.Clue;
 import per.iys.crm.workbench.domain.ClueActivityRelation;
 import per.iys.crm.workbench.domain.ClueRemark;
 import per.iys.crm.workbench.service.ActivityService;
 import per.iys.crm.workbench.service.ClueActivityRelationService;
 import per.iys.crm.workbench.service.ClueRemarkService;
-import per.iys.crm.workbench.service.ClueService;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
