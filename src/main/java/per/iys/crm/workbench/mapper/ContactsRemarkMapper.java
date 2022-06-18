@@ -3,6 +3,8 @@ package per.iys.crm.workbench.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.ContactsRemark;
 
+import java.util.List;
+
 @Mapper
 public interface ContactsRemarkMapper {
     /**
@@ -52,4 +54,12 @@ public interface ContactsRemarkMapper {
      * @mbg.generated Fri Jun 17 19:56:34 CST 2022
      */
     int updateByPrimaryKey(ContactsRemark row);
+
+    /**
+     * 批量保存创建的联系人备注
+     *
+     * @param contactsRemarkList
+     * @return
+     */
+    int insertContactsRemarkByList(List<ContactsRemark> contactsRemarkList);
 }

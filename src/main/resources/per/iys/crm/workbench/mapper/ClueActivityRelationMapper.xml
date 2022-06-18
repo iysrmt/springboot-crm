@@ -124,4 +124,17 @@
         where clue_id = #{clueId}
           and activity_id = #{activityId}
     </delete>
+
+    <select id="selectClueActivityRelationByClueId" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tbl_clue_activity_relation
+        where clue_id = #{clueId}
+    </select>
+
+    <delete id="deleteClueActivityRelationByClueId" parameterType="string">
+        delete
+        from tbl_clue_activity_relation
+        where clue_id = #{clueId}
+    </delete>
 </mapper>

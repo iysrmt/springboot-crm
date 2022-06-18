@@ -3,6 +3,8 @@ package per.iys.crm.workbench.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.ContactsActivityRelation;
 
+import java.util.List;
+
 @Mapper
 public interface ContactsActivityRelationMapper {
     /**
@@ -52,4 +54,12 @@ public interface ContactsActivityRelationMapper {
      * @mbg.generated Fri Jun 17 19:56:34 CST 2022
      */
     int updateByPrimaryKey(ContactsActivityRelation row);
+
+    /**
+     * 批量保存 联系人与市场活动关联关系
+     *
+     * @param contactsActivityRelationList
+     * @return
+     */
+    int insertContactsActivityRelationByList(List<ContactsActivityRelation> contactsActivityRelationList);
 }

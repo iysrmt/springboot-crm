@@ -111,4 +111,12 @@ public interface ClueMapper {
      * @return 线索
      */
     Clue selectClueForDetailById(String id);
+
+    /**
+     * 根据id删除线索
+     *
+     * @param id
+     * @return
+     */
+    int deleteClueById(String id);
 }

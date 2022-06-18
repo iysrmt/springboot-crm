@@ -470,4 +470,10 @@
                  left join tbl_dic_value dv3 on c.source = dv3.id
         where c.id = #{id}
     </select>
+
+    <delete id="deleteClueById" parameterType="string">
+        delete
+        from tbl_clue
+        where id = #{id}
+    </delete>
 </mapper>

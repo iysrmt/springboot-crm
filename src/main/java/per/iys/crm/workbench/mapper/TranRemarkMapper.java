@@ -3,6 +3,8 @@ package per.iys.crm.workbench.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.TranRemark;
 
+import java.util.List;
+
 @Mapper
 public interface TranRemarkMapper {
     /**
@@ -52,4 +54,12 @@ public interface TranRemarkMapper {
      * @mbg.generated Fri Jun 17 19:56:34 CST 2022
      */
     int updateByPrimaryKey(TranRemark row);
+
+    /**
+     * 批量保存交易备注
+     *
+     * @param tranRemarkList
+     * @return
+     */
+    int insertTranRemarkByList(List<TranRemark> tranRemarkList);
 }

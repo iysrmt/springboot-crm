@@ -56,7 +56,7 @@ public interface ClueRemarkMapper {
     int updateByPrimaryKey(ClueRemark row);
 
     /**
-     * 根据线索查询备注
+     * 根据线索查询备注, 数据已连接其他表, 可返回给前台
      *
      * @param clueId 线索id
      * @return 线索备注
@@ -86,4 +86,20 @@ public interface ClueRemarkMapper {
      * @return 成功操作记录条数, 1表示成功, 0表示失败
      */
     int updateClueRemarkById(ClueRemark clueRemark);
+
+    /**
+     * 根据线索id查询线索备注, 未连接查询, 数据不能直接返回给前台.
+     *
+     * @param clueId
+     * @return
+     */
+    List<ClueRemark> selectClueRemarkByClueIdIsNotJoin(String clueId);
+
+    /**
+     * 根据线索id删除线索
+     *
+     * @param clueId
+     * @return
+     */
+    int deleteClueRemarkByClueId(String clueId);
 }

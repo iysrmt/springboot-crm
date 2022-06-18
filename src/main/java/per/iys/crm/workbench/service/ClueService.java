@@ -66,7 +66,7 @@ public interface ClueService {
     /**
      * 转换市场活动
      *
-     * @param map key: clueId, sessionUser, tran, isCreateTran
+     * @param map key: clueId, sessionUser, tran, isCreateTran, activityId
      */
     void saveCovertClue(Map<String, Object> map);
 }

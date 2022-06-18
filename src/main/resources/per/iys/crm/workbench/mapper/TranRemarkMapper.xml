@@ -165,4 +165,13 @@
         tran_id = #{tranId,jdbcType=CHAR}
         where id = #{id,jdbcType=CHAR}
     </update>
+
+    <insert id="insertTranRemarkByList" parameterType="per.iys.crm.workbench.domain.TranRemark">
+        insert into tbl_tran_remark(id, note_content, create_by, create_time, edit_by, edit_time, edit_flag, tran_id)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.noteContent}, #{item.createBy}, #{item.createTime}, #{item.editBy}, #{item.editTime},
+            #{item.editFlag}, #{item.tranId})
+        </foreach>
+    </insert>
 </mapper>

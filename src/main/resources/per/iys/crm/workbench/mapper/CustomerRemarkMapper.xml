@@ -165,4 +165,14 @@
         customer_id = #{customerId,jdbcType=CHAR}
         where id = #{id,jdbcType=CHAR}
     </update>
+
+    <insert id="insertCustomerRemarkByList" parameterType="per.iys.crm.workbench.domain.CustomerRemark">
+        insert into tbl_customer_remark(id, note_content, create_by, create_time, edit_by, edit_time, edit_flag,
+        customer_id)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.noteContent}, #{item.createBy}, #{item.createTime}, #{item.editBy}, #{item.editTime},
+            #{item.editFlag}, #{item.customerId})
+        </foreach>
+    </insert>
 </mapper>

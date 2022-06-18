@@ -108,4 +108,13 @@
         activity_id = #{activityId,jdbcType=CHAR}
         where id = #{id,jdbcType=CHAR}
     </update>
+
+    <insert id="insertContactsActivityRelationByList"
+            parameterType="per.iys.crm.workbench.domain.ContactsActivityRelation">
+        insert into tbl_contacts_activity_relation(<include refid="Base_Column_List"/>)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.contactsId}, #{item.activityId})
+        </foreach>
+    </insert>
 </mapper>

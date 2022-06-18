@@ -208,7 +208,7 @@ public class ClueController {
     }
 
     @ResponseBody
-    @PostMapping("/convert/convertClue")
+    @PutMapping("/convert/convertClue")
     public Object convertClue(HttpSession session, String clueId, Tran tran, String isCreateTran) {
         ReturnObject returnObject = new ReturnObject();
         // 封装参数

@@ -52,4 +52,6 @@ public interface TranMapper {
      * @mbg.generated Fri Jun 17 16:47:26 CST 2022
      */
     int updateByPrimaryKey(Tran row);
+
+    int insertTran(Tran tran);
 }
