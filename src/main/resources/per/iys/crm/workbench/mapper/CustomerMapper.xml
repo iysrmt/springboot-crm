@@ -298,4 +298,26 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="selectCustomerById" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tbl_customer
+        where id = #{id}
+    </select>
+
+    <update id="updateCustomerById" parameterType="per.iys.crm.workbench.domain.Customer">
+        update tbl_customer
+        set owner             = #{owner},
+            name              = #{name},
+            website           = #{website},
+            phone             = #{phone},
+            edit_by           = #{editBy},
+            edit_time         = #{editTime},
+            contact_summary   = #{contactSummary},
+            next_contact_time = #{nextContactTime},
+            description       = #{description},
+            address           = #{address}
+        where id = #{id}
+    </update>
 </mapper>

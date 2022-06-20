@@ -64,7 +64,7 @@
                 // 下次联系时间
                 let nextContactTime = $("#create-nextContactTime").val();
                 // 详细地址
-                let address = $.trim($("#create-address1").val());
+                let address = $.trim($("#create-address").val());
 
                 // 参数判断
                 // 名称
@@ -171,13 +171,107 @@
 
             // 实现修改功能
             $("#modifyBtn").click(function () {
+
+                let checkIds = $("#tbody-customerList input[type='checkbox']:checked");
+                if (checkIds.size() === 0) {
+                    alert("请选择需要修改的线索");
+                    return;
+                }
+                if (checkIds.size() > 1) {
+                    alert("一次只能修改一条线索");
+                    return;
+                }
+                let id = checkIds.val();
+
                 // 清空修改客户模态窗口内容
                 $("#modifyCustomer-From").get(0).reset();
-                // 展示修改客户模态窗口
-                $("#editCustomerModal").modal("show");
-            });
-            $("#updateBtn").click(function () {
 
+                // 发送请求 获取参数 添加到修改模态窗口
+                $.ajax({
+                    url: "workbench/customer/queryCustomerById",
+                    type: "get",
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        // 填充信息
+                        $("#edit-id").val(resp.id);
+                        $("#edit-owner").val(resp.owner);
+                        $("#edit-name").val(resp.name);
+                        $("#edit-website").val(resp.website);
+                        $("#edit-phone").val(resp.phone);
+                        $("#edit-description").val(resp.description);
+                        $("#edit-contactSummary").val(resp.contactSummary);
+                        $("#edit-nextContactTime").val(resp.nextContactTime);
+                        $("#edit-address").val(resp.address);
+
+                        // 展示修改客户模态窗口
+                        $("#editCustomerModal").modal("show");
+                    }
+                })
+            });
+
+            // 实现按更新按钮功能
+            $("#updateBtn").click(function () {
+                // 收集参数
+                let id = $("#edit-id").val();
+                let owner = $("#edit-owner").val();
+                let name = $.trim($("#edit-name").val());
+                let website = $.trim($("#edit-website").val());
+                let phone = $.trim($("#edit-phone").val());
+                let description = $.trim($("#edit-description").val());
+                let contactSummary = $.trim($("#edit-contactSummary").val());
+                let nextContactTime = $("#edit-nextContactTime").val();
+                let address = $.trim($("#edit-address").val());
+
+                // 参数判断
+                // 名称
+                if (name === "") {
+                    alert("名称不能为空!");
+                    return;
+                }
+                //  公司网站格式判断
+                let websiteRegExp = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
+                if (website !== "" && !websiteRegExp.test(website)) {
+                    alert("公司网站错误!")
+                    return;
+                }
+                // 公司座机格式判断
+                let phoneRegExp = /0\d{2,3}-\d{7,8}/
+                if (phone !== "" && !phoneRegExp.test(phone)) {
+                    alert("公司座机格式错误!");
+                    return;
+                }
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/customer/modifyCustomerById",
+                    type: "put",
+                    data: {
+                        id: id,
+                        owner: owner,
+                        name: name,
+                        website: website,
+                        phone: phone,
+                        description: description,
+                        contactSummary: contactSummary,
+                        nextContactTime: nextContactTime,
+                        address: address
+                    },
+                    dataType: "json",
+                    success: function (resp) {
+                        if (resp.status === "1") {
+                            // 成功关闭模态窗口
+                            $("#editCustomerModal").modal("hide");
+                            // 刷新客户列表
+                            queryCustomerByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                        } else {
+                            // 失败 提示信息
+                            alert(resp.message);
+                        }
+                    }
+                })
             })
             // ========== 入口函数 end ==========
         });
@@ -315,9 +409,9 @@
 
                     <div style="position: relative;top: 20px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-address1">详细地址</label>
+                            <label class="col-sm-2 control-label" for="create-address">详细地址</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="create-address1" rows="1"></textarea>
+                                <textarea class="form-control" id="create-address" rows="1"></textarea>
                             </div>
                         </div>
                     </div>
@@ -344,21 +438,20 @@
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form" id="modifyCustomer-From">
-
+                    <input id="edit-id" type="hidden">
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="edit-customerOwner">所有者<span
+                        <label class="col-sm-2 control-label" for="edit-owner">所有者<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="edit-customerOwner">
-                                <option>zhangsan</option>
-                                <option>lisi</option>
-                                <option>wangwu</option>
+                            <select class="form-control" id="edit-owner">
+                                <option th:each="user:${userList}" th:value="${user.id}"
+                                        th:text="${user.name}"></option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label" for="edit-customerName">名称<span
+                        <label class="col-sm-2 control-label" for="edit-name">名称<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input class="form-control" id="edit-customerName" type="text" value="动力节点">
+                            <input class="form-control" id="edit-name" type="text" value="动力节点">
                         </div>
                     </div>
 
@@ -375,9 +468,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="edit-describe">描述</label>
+                        <label class="col-sm-2 control-label" for="edit-description">描述</label>
                         <div class="col-sm-10" style="width: 81%;">
-                            <textarea class="form-control" id="edit-describe" rows="3"></textarea>
+                            <textarea class="form-control" id="edit-description" rows="3"></textarea>
                         </div>
                     </div>
 
@@ -385,15 +478,15 @@
 
                     <div style="position: relative;top: 15px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-contactSummary1">联系纪要</label>
+                            <label class="col-sm-2 control-label" for="edit-contactSummary">联系纪要</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="create-contactSummary1" rows="3"></textarea>
+                                <textarea class="form-control" id="edit-contactSummary" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="update-nextContactTime">下次联系时间</label>
+                            <label class="col-sm-2 control-label" for="edit-nextContactTime">下次联系时间</label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input class="form-control date-time" id="update-nextContactTime" type="text" readonly>
+                                <input class="form-control date-time" id="edit-nextContactTime" type="text" readonly>
                             </div>
                         </div>
                     </div>
@@ -402,9 +495,9 @@
 
                     <div style="position: relative;top: 20px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-address">详细地址</label>
+                            <label class="col-sm-2 control-label" for="edit-address">详细地址</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="create-address" rows="1">北京大兴大族企业湾</textarea>
+                                <textarea class="form-control" id="edit-address" rows="1">北京大兴大族企业湾</textarea>
                             </div>
                         </div>
                     </div>

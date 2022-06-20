@@ -38,4 +38,20 @@ public interface CustomerService {
      * @return
      */
     int removeCustomerByIds(String[] ids);
+
+    /**
+     * 根据id查询指定客户
+     *
+     * @param id
+     * @return
+     */
+    Customer queryCustomerById(String id);
+
+    /**
+     * 根据id更新客户信息
+     *
+     * @param customer
+     * @return
+     */
+    int modifyCustomerById(Customer customer);
 }

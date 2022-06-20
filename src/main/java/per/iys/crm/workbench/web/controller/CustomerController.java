@@ -108,4 +108,40 @@ public class CustomerController {
         }
         return returnObject;
     }
+
+    // 查询客户信息
+    @ResponseBody
+    @GetMapping("/queryCustomerById")
+    public Object queryCustomerById(String id) {
+        return customerService.queryCustomerById(id);
+    }
+
+    // 更新客户信息
+    @ResponseBody
+    @PutMapping("/modifyCustomerById")
+    public Object modifyCustomerById(Customer customer, HttpSession session) {
+        ReturnObject returnObject = new ReturnObject();
+        User user = (User) session.getAttribute(Constants.SESSION_USER);
+
+        // 二次封装
+        customer.setEditBy(user.getId());
+        customer.setEditTime(DateUtils.format(new Date()));
+
+        try {
+            int ret = customerService.modifyCustomerById(customer);
+            if (ret > 0) {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_SUCCESS);
+            } else {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+                returnObject.setMessage("系统繁忙, 请稍后重试...");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+            returnObject.setMessage("系统繁忙, 请稍后重试...");
+        }
+
+        return returnObject;
+    }
+
 }
