@@ -43,13 +43,15 @@ public class UserController {
         // 未登陆, 获取cookie请求转发到登陆页面
         model.addAttribute("remember", false);
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if ("loginAct".equals(cookie.getName())) {
-                model.addAttribute("loginActCookie", cookie.getValue());
-            }
-            if ("loginPwd".equals(cookie.getName())) {
-                model.addAttribute("loginPwdCookie", cookie.getValue());
-                model.addAttribute("remember", true);
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("loginAct".equals(cookie.getName())) {
+                    model.addAttribute("loginActCookie", cookie.getValue());
+                }
+                if ("loginPwd".equals(cookie.getName())) {
+                    model.addAttribute("loginPwdCookie", cookie.getValue());
+                    model.addAttribute("remember", true);
+                }
             }
         }
         // 未登录跳转到登陆页面
