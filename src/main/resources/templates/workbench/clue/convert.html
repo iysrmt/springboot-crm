@@ -237,7 +237,7 @@
             <label for="stage">阶段</label>
             <select class="form-control" id="stage">
                 <option></option>
-                <option th:each="stage:${stageList}" th:value="${stage.value}" th:text="${stage.text}"></option>
+                <option th:each="stage:${stageList}" th:value="${stage.id}" th:text="${stage.value}"></option>
             </select>
         </div>
         <div class="form-group" style="width: 400px;position: relative; left: 20px;">
