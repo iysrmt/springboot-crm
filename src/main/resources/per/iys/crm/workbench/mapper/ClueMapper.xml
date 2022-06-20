@@ -9,7 +9,7 @@
         -->
         <id column="id" jdbcType="CHAR" property="id"/>
         <result column="full_name" jdbcType="VARCHAR" property="fullName"/>
-        <result column="appellation" jdbcType="VARCHAR" property="appellation"/>
+        <result column="appellation" jdbcType="CHAR" property="appellation"/>
         <result column="owner" jdbcType="CHAR" property="owner"/>
         <result column="company" jdbcType="VARCHAR" property="company"/>
         <result column="job" jdbcType="VARCHAR" property="job"/>
@@ -17,8 +17,8 @@
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="website" jdbcType="VARCHAR" property="website"/>
         <result column="m_phone" jdbcType="VARCHAR" property="mPhone"/>
-        <result column="state" jdbcType="VARCHAR" property="state"/>
-        <result column="source" jdbcType="VARCHAR" property="source"/>
+        <result column="state" jdbcType="CHAR" property="state"/>
+        <result column="source" jdbcType="CHAR" property="source"/>
         <result column="create_by" jdbcType="CHAR" property="createBy"/>
         <result column="create_time" jdbcType="CHAR" property="createTime"/>
         <result column="edit_by" jdbcType="CHAR" property="editBy"/>
@@ -71,10 +71,10 @@
         create_time, edit_by, edit_time,
         description, contact_summary, next_contact_time,
         address)
-        values (#{id,jdbcType=CHAR}, #{fullName,jdbcType=VARCHAR}, #{appellation,jdbcType=VARCHAR},
+        values (#{id,jdbcType=CHAR}, #{fullName,jdbcType=VARCHAR}, #{appellation,jdbcType=CHAR},
         #{owner,jdbcType=CHAR}, #{company,jdbcType=VARCHAR}, #{job,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
         #{phone,jdbcType=VARCHAR}, #{website,jdbcType=VARCHAR}, #{mPhone,jdbcType=VARCHAR},
-        #{state,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, #{createBy,jdbcType=CHAR},
+        #{state,jdbcType=CHAR}, #{source,jdbcType=CHAR}, #{createBy,jdbcType=CHAR},
         #{createTime,jdbcType=CHAR}, #{editBy,jdbcType=CHAR}, #{editTime,jdbcType=CHAR},
         #{description,jdbcType=VARCHAR}, #{contactSummary,jdbcType=VARCHAR}, #{nextContactTime,jdbcType=CHAR},
         #{address,jdbcType=VARCHAR})
@@ -156,7 +156,7 @@
                 #{fullName,jdbcType=VARCHAR},
             </if>
             <if test="appellation != null">
-                #{appellation,jdbcType=VARCHAR},
+                #{appellation,jdbcType=CHAR},
             </if>
             <if test="owner != null">
                 #{owner,jdbcType=CHAR},
@@ -180,10 +180,10 @@
                 #{mPhone,jdbcType=VARCHAR},
             </if>
             <if test="state != null">
-                #{state,jdbcType=VARCHAR},
+                #{state,jdbcType=CHAR},
             </if>
             <if test="source != null">
-                #{source,jdbcType=VARCHAR},
+                #{source,jdbcType=CHAR},
             </if>
             <if test="createBy != null">
                 #{createBy,jdbcType=CHAR},
@@ -223,7 +223,7 @@
                 full_name = #{fullName,jdbcType=VARCHAR},
             </if>
             <if test="appellation != null">
-                appellation = #{appellation,jdbcType=VARCHAR},
+                appellation = #{appellation,jdbcType=CHAR},
             </if>
             <if test="owner != null">
                 owner = #{owner,jdbcType=CHAR},
@@ -247,10 +247,10 @@
                 m_phone = #{mPhone,jdbcType=VARCHAR},
             </if>
             <if test="state != null">
-                state = #{state,jdbcType=VARCHAR},
+                state = #{state,jdbcType=CHAR},
             </if>
             <if test="source != null">
-                source = #{source,jdbcType=VARCHAR},
+                source = #{source,jdbcType=CHAR},
             </if>
             <if test="createBy != null">
                 create_by = #{createBy,jdbcType=CHAR},
@@ -287,7 +287,7 @@
         -->
         update tbl_clue
         set full_name = #{fullName,jdbcType=VARCHAR},
-        appellation = #{appellation,jdbcType=VARCHAR},
+        appellation = #{appellation,jdbcType=CHAR},
         owner = #{owner,jdbcType=CHAR},
         company = #{company,jdbcType=VARCHAR},
         job = #{job,jdbcType=VARCHAR},
@@ -295,8 +295,8 @@
         phone = #{phone,jdbcType=VARCHAR},
         website = #{website,jdbcType=VARCHAR},
         m_phone = #{mPhone,jdbcType=VARCHAR},
-        state = #{state,jdbcType=VARCHAR},
-        source = #{source,jdbcType=VARCHAR},
+        state = #{state,jdbcType=CHAR},
+        source = #{source,jdbcType=CHAR},
         create_by = #{createBy,jdbcType=CHAR},
         create_time = #{createTime,jdbcType=CHAR},
         edit_by = #{editBy,jdbcType=CHAR},

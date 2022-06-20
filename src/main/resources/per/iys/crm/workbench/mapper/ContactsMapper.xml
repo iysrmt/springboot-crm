@@ -12,7 +12,7 @@
         <result column="source" jdbcType="VARCHAR" property="source"/>
         <result column="customer_id" jdbcType="CHAR" property="customerId"/>
         <result column="full_name" jdbcType="VARCHAR" property="fullName"/>
-        <result column="appellation" jdbcType="VARCHAR" property="appellation"/>
+        <result column="appellation" jdbcType="CHAR" property="appellation"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="m_phone" jdbcType="VARCHAR" property="mPhone"/>
         <result column="job" jdbcType="VARCHAR" property="job"/>
@@ -68,7 +68,7 @@
         edit_time, description, contact_summary,
         next_contact_time, address)
         values (#{id,jdbcType=CHAR}, #{owner,jdbcType=CHAR}, #{source,jdbcType=VARCHAR},
-        #{customerId,jdbcType=CHAR}, #{fullName,jdbcType=VARCHAR}, #{appellation,jdbcType=VARCHAR},
+        #{customerId,jdbcType=CHAR}, #{fullName,jdbcType=VARCHAR}, #{appellation,jdbcType=CHAR},
         #{email,jdbcType=VARCHAR}, #{mPhone,jdbcType=VARCHAR}, #{job,jdbcType=VARCHAR},
         #{createBy,jdbcType=CHAR}, #{createTime,jdbcType=CHAR}, #{editBy,jdbcType=CHAR},
         #{editTime,jdbcType=CHAR}, #{description,jdbcType=VARCHAR}, #{contactSummary,jdbcType=VARCHAR},
@@ -151,7 +151,7 @@
                 #{fullName,jdbcType=VARCHAR},
             </if>
             <if test="appellation != null">
-                #{appellation,jdbcType=VARCHAR},
+                #{appellation,jdbcType=CHAR},
             </if>
             <if test="email != null">
                 #{email,jdbcType=VARCHAR},
@@ -209,7 +209,7 @@
                 full_name = #{fullName,jdbcType=VARCHAR},
             </if>
             <if test="appellation != null">
-                appellation = #{appellation,jdbcType=VARCHAR},
+                appellation = #{appellation,jdbcType=CHAR},
             </if>
             <if test="email != null">
                 email = #{email,jdbcType=VARCHAR},
@@ -258,7 +258,7 @@
         source = #{source,jdbcType=VARCHAR},
         customer_id = #{customerId,jdbcType=CHAR},
         full_name = #{fullName,jdbcType=VARCHAR},
-        appellation = #{appellation,jdbcType=VARCHAR},
+        appellation = #{appellation,jdbcType=CHAR},
         email = #{email,jdbcType=VARCHAR},
         m_phone = #{mPhone,jdbcType=VARCHAR},
         job = #{job,jdbcType=VARCHAR},
@@ -279,4 +279,31 @@
         values (#{id}, #{owner}, #{source}, #{customerId}, #{fullName}, #{appellation}, #{email}, #{mPhone}, #{job},
                 #{createBy}, #{createTime}, #{description}, #{contactSummary}, #{nextContactTime}, #{address})
     </insert>
+
+    <select id="selectContactsByCustomerId" parameterType="string" resultMap="BaseResultMap">
+        select c.id,
+               u1.name   as owner,
+               dv1.value as source,
+               c.customer_id,
+               c.full_name,
+               dv2.value as appellation,
+               c.email,
+               c.m_phone,
+               c.job,
+               u2.name   as create_by,
+               c.create_time,
+               u3.name   as edit_by,
+               c.edit_time,
+               c.description,
+               c.contact_summary,
+               c.next_contact_time,
+               c.address
+        from tbl_contacts c
+                 join tbl_user u1 on c.owner = u1.id
+                 join tbl_user u2 on c.create_by = u2.id
+                 left join tbl_user u3 on c.edit_by = u3.id
+                 left join tbl_dic_value dv1 on c.source = dv1.id
+                 left join tbl_dic_value dv2 on c.appellation = dv2.id
+        where c.customer_id = #{customerId}
+    </select>
 </mapper>

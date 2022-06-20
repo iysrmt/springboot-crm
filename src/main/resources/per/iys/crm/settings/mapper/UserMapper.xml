@@ -10,7 +10,7 @@
         <id column="id" jdbcType="CHAR" property="id"/>
         <result column="login_act" jdbcType="VARCHAR" property="loginAct"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="login_pwd" jdbcType="VARCHAR" property="loginPwd"/>
+        <result column="login_pwd" jdbcType="CHAR" property="loginPwd"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="expire_time" jdbcType="CHAR" property="expireTime"/>
         <result column="lock_state" jdbcType="CHAR" property="lockState"/>
@@ -62,7 +62,7 @@
         create_time, create_by, edit_time,
         edit_by)
         values (#{id,jdbcType=CHAR}, #{loginAct,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
-        #{loginPwd,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{expireTime,jdbcType=CHAR},
+        #{loginPwd,jdbcType=CHAR}, #{email,jdbcType=VARCHAR}, #{expireTime,jdbcType=CHAR},
         #{lockState,jdbcType=CHAR}, #{deptNo,jdbcType=CHAR}, #{allowIps,jdbcType=VARCHAR},
         #{createTime,jdbcType=CHAR}, #{createBy,jdbcType=CHAR}, #{editTime,jdbcType=CHAR},
         #{editBy,jdbcType=CHAR})
@@ -126,7 +126,7 @@
                 #{name,jdbcType=VARCHAR},
             </if>
             <if test="loginPwd != null">
-                #{loginPwd,jdbcType=VARCHAR},
+                #{loginPwd,jdbcType=CHAR},
             </if>
             <if test="email != null">
                 #{email,jdbcType=VARCHAR},
@@ -172,7 +172,7 @@
                 name = #{name,jdbcType=VARCHAR},
             </if>
             <if test="loginPwd != null">
-                login_pwd = #{loginPwd,jdbcType=VARCHAR},
+                login_pwd = #{loginPwd,jdbcType=CHAR},
             </if>
             <if test="email != null">
                 email = #{email,jdbcType=VARCHAR},
@@ -213,7 +213,7 @@
         update tbl_user
         set login_act = #{loginAct,jdbcType=VARCHAR},
         name = #{name,jdbcType=VARCHAR},
-        login_pwd = #{loginPwd,jdbcType=VARCHAR},
+        login_pwd = #{loginPwd,jdbcType=CHAR},
         email = #{email,jdbcType=VARCHAR},
         expire_time = #{expireTime,jdbcType=CHAR},
         lock_state = #{lockState,jdbcType=CHAR},

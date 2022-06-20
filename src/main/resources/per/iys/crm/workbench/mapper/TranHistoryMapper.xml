@@ -8,7 +8,7 @@
           This element was generated on Fri Jun 17 19:56:34 CST 2022.
         -->
         <id column="id" jdbcType="CHAR" property="id"/>
-        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        <result column="stage" jdbcType="CHAR" property="stage"/>
         <result column="money" jdbcType="VARCHAR" property="money"/>
         <result column="expected_date" jdbcType="CHAR" property="expectedDate"/>
         <result column="create_time" jdbcType="CHAR" property="createTime"/>
@@ -52,7 +52,7 @@
         insert into tbl_tran_history (id, stage, money,
         expected_date, create_time, create_by,
         tran_id)
-        values (#{id,jdbcType=CHAR}, #{stage,jdbcType=VARCHAR}, #{money,jdbcType=VARCHAR},
+        values (#{id,jdbcType=CHAR}, #{stage,jdbcType=CHAR}, #{money,jdbcType=VARCHAR},
         #{expectedDate,jdbcType=CHAR}, #{createTime,jdbcType=CHAR}, #{createBy,jdbcType=CHAR},
         #{tranId,jdbcType=CHAR})
     </insert>
@@ -91,7 +91,7 @@
                 #{id,jdbcType=CHAR},
             </if>
             <if test="stage != null">
-                #{stage,jdbcType=VARCHAR},
+                #{stage,jdbcType=CHAR},
             </if>
             <if test="money != null">
                 #{money,jdbcType=VARCHAR},
@@ -119,7 +119,7 @@
         update tbl_tran_history
         <set>
             <if test="stage != null">
-                stage = #{stage,jdbcType=VARCHAR},
+                stage = #{stage,jdbcType=CHAR},
             </if>
             <if test="money != null">
                 money = #{money,jdbcType=VARCHAR},
@@ -146,7 +146,7 @@
           This element was generated on Fri Jun 17 19:56:34 CST 2022.
         -->
         update tbl_tran_history
-        set stage = #{stage,jdbcType=VARCHAR},
+        set stage = #{stage,jdbcType=CHAR},
         money = #{money,jdbcType=VARCHAR},
         expected_date = #{expectedDate,jdbcType=CHAR},
         create_time = #{createTime,jdbcType=CHAR},
