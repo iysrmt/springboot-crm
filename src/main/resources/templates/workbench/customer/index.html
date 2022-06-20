@@ -137,6 +137,48 @@
                 queryCustomerByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
             })
 
+            // 实现删除功能
+            $("#removeBtn").click(function () {
+                let $checkedIds = $("#tbody-customerList input[type='checkbox']:checked");
+                if ($checkedIds.size() === 0) {
+                    alert("请选择要删除的市场活动");
+                    return;
+                }
+
+                if (window.confirm("确定删除?")) {
+                    let ids = "";
+                    $.each($checkedIds, function () {
+                        ids += "id=" + this.value + "&";
+                    });
+                    ids = ids.substr(0, ids.length - 1);
+                    // 发送请求
+                    $.ajax({
+                        url: "workbench/customer/removeCustomerByIds",
+                        type: "delete",
+                        data: ids,
+                        dataType: "json",
+                        success: function (resp) {
+                            if (resp.status === "1") {
+                                // 刷新列表
+                                queryCustomerByConditionForPage(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                            } else {
+                                alert(resp.message);
+                            }
+                        }
+                    })
+                }
+            });
+
+            // 实现修改功能
+            $("#modifyBtn").click(function () {
+                // 清空修改客户模态窗口内容
+                $("#modifyCustomer-From").get(0).reset();
+                // 展示修改客户模态窗口
+                $("#editCustomerModal").modal("show");
+            });
+            $("#updateBtn").click(function () {
+
+            })
             // ========== 入口函数 end ==========
         });
 
@@ -301,7 +343,7 @@
                 <h4 class="modal-title" id="myModalLabel">修改客户</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" role="form">
+                <form class="form-horizontal" role="form" id="modifyCustomer-From">
 
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="edit-customerOwner">所有者<span
@@ -371,7 +413,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
-                <button class="btn btn-primary" data-dismiss="modal" type="button">更新</button>
+                <button class="btn btn-primary" type="button" id="updateBtn">更新</button>
             </div>
         </div>
     </div>
@@ -431,10 +473,12 @@
                 <button class="btn btn-primary" type="button" id="createBtn">
                     <span class="glyphicon glyphicon-plus"></span> 创建
                 </button>
-                <button class="btn btn-default" data-target="#editCustomerModal" data-toggle="modal" type="button"><span
+                <button class="btn btn-default" type="button" id="modifyBtn"><span
                         class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+                <button class="btn btn-danger" type="button" id="removeBtn"><span
+                        class="glyphicon glyphicon-minus"></span> 删除
+                </button>
             </div>
 
         </div>

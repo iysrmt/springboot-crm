@@ -3,10 +3,7 @@ package per.iys.crm.workbench.web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import per.iys.crm.commons.constants.Constants;
 import per.iys.crm.commons.domain.ReturnObject;
 import per.iys.crm.commons.utils.DateUtils;
@@ -35,6 +32,7 @@ public class CustomerController {
         this.userService = userService;
     }
 
+    // 客户主页
     @GetMapping("/")
     public String index(Model model) {
         List<User> userList = userService.queryAllUsers();
@@ -42,6 +40,7 @@ public class CustomerController {
         return "workbench/customer/index";
     }
 
+    // 创建客户
     @ResponseBody
     @PostMapping("/saveCreateCustomer")
     public Object saveCreateCustomer(Customer customer, HttpSession session) {
@@ -70,6 +69,7 @@ public class CustomerController {
         return returnObject;
     }
 
+    // 分页查询显示客户
     @ResponseBody
     @GetMapping("/queryCustomerByConditionForPage")
     public Object queryCustomerByConditionForPage(Customer customer, int pageNo, int pageSize) {
@@ -86,5 +86,26 @@ public class CustomerController {
         retMap.put("totalRows", totalRows);
 
         return retMap;
+    }
+
+    // 删除客户
+    @ResponseBody
+    @DeleteMapping("/removeCustomerByIds")
+    public Object removeCustomerByIds(String[] id) {
+        ReturnObject returnObject = new ReturnObject();
+        try {
+            int ret = customerService.removeCustomerByIds(id);
+            if (ret > 0) {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_SUCCESS);
+            } else {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+                returnObject.setMessage("系统繁忙, 请稍后重试...");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+            returnObject.setMessage("系统繁忙, 请稍后重试...");
+        }
+        return returnObject;
     }
 }

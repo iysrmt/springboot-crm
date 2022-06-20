@@ -30,4 +30,12 @@ public interface CustomerService {
      * @return
      */
     int queryCountOfCustomerByCondition(Map<String, Object> map);
+
+    /**
+     * 根据多条id删除客户
+     *
+     * @param ids
+     * @return
+     */
+    int removeCustomerByIds(String[] ids);
 }

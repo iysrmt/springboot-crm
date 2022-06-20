@@ -79,4 +79,12 @@ public interface CustomerMapper {
      * @return
      */
     int selectCountOfCustomerByCondition(Map<String, Object> map);
+
+    /**
+     * 根据多条id删除客户
+     *
+     * @param ids
+     * @return
+     */
+    int deleteCustomerByIds(String[] ids);
 }
