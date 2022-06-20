@@ -78,7 +78,7 @@ public interface ClueMapper {
      * @param conditions map集合, key: fullName,company,phone,source,owner,mPhone,state. 可为空
      * @return 总记录条数
      */
-    int selectCountOfActivityByCondition(Map<String, Object> conditions);
+    int selectCountOfClueByCondition(Map<String, Object> conditions);
 
     /**
      * 根据id获取指定线索, 不连接

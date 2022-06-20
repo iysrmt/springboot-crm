@@ -103,7 +103,7 @@ public class ClueController {
 
         // 调用service方法
         List<Clue> clueList = clueService.queryClueByConditionForPage(map);
-        int totalRows = clueService.queryCountOfActivityByCondition(map);
+        int totalRows = clueService.queryCountOfClueByCondition(map);
 
         // 响应参数
         Map<String, Object> retMap = new HashMap<>();

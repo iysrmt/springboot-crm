@@ -370,7 +370,7 @@
         order by c.create_time desc
         limit #{beginNo}, #{pageSize}
     </select>
-    <select id="selectCountOfActivityByCondition" resultType="int">
+    <select id="selectCountOfClueByCondition" resultType="int">
         select count(*)
         from tbl_clue c
         join tbl_user u1 on c.owner = u1.id

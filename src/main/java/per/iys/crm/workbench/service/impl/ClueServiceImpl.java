@@ -56,8 +56,8 @@ public class ClueServiceImpl implements ClueService {
     }
 
     @Override
-    public int queryCountOfActivityByCondition(Map<String, Object> conditions) {
-        return clueMapper.selectCountOfActivityByCondition(conditions);
+    public int queryCountOfClueByCondition(Map<String, Object> conditions) {
+        return clueMapper.selectCountOfClueByCondition(conditions);
     }
 
     @Override

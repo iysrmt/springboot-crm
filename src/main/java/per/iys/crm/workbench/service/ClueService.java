@@ -29,7 +29,7 @@ public interface ClueService {
      * @param conditions map集合, key: fullName,company,phone,source,owner,mPhone,state. 可为空
      * @return 总记录条数
      */
-    int queryCountOfActivityByCondition(Map<String, Object> conditions);
+    int queryCountOfClueByCondition(Map<String, Object> conditions);
 
     /**
      * 根据id获取指定线索
