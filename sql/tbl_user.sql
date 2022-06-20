@@ -22,10 +22,10 @@ FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `tbl_user`;
 CREATE TABLE `tbl_user`
 (
-    `id`          char(32) NOT NULL COMMENT 'uuid\r\n            ',
+    `id`          char(32) NOT NULL COMMENT 'uuid',
     `login_act`   varchar(255) DEFAULT NULL,
     `name`        varchar(255) DEFAULT NULL,
-    `login_pwd`   varchar(255) DEFAULT NULL COMMENT '密码不能采用明文存储，采用密文，MD5加密之后的数据',
+    `login_pwd`   char(32)     DEFAULT NULL COMMENT '密码不能采用明文存储，采用密文，MD5加密之后的数据',
     `email`       varchar(255) DEFAULT NULL,
     `expire_time` char(19)     DEFAULT NULL COMMENT '失效时间为空的时候表示永不失效，失效时间为2018-10-10 10:10:10，则表示在该时间之前该账户可用。',
     `lock_state`  char(1)      DEFAULT NULL COMMENT '锁定状态为空时表示启用，为0时表示锁定，为1时表示启用。',
