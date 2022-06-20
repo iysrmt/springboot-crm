@@ -18,7 +18,9 @@ import per.iys.crm.workbench.service.CustomerService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/workbench/customer")
@@ -66,5 +68,23 @@ public class CustomerController {
         }
 
         return returnObject;
+    }
+
+    @ResponseBody
+    @GetMapping("/queryCustomerByConditionForPage")
+    public Object queryCustomerByConditionForPage(Customer customer, int pageNo, int pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("customer", customer);
+        map.put("beginNo", (pageNo - 1) * pageSize);
+        map.put("pageSize", pageSize);
+
+        List<Customer> customerList = customerService.queryCustomerByConditionForPage(map);
+        int totalRows = customerService.queryCountOfCustomerByCondition(map);
+
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("customerList", customerList);
+        retMap.put("totalRows", totalRows);
+
+        return retMap;
     }
 }

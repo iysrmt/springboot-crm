@@ -6,6 +6,9 @@ import per.iys.crm.workbench.domain.Customer;
 import per.iys.crm.workbench.mapper.CustomerMapper;
 import per.iys.crm.workbench.service.CustomerService;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
@@ -19,5 +22,15 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public int createCustomer(Customer customer) {
         return customerMapper.insertCustomer(customer);
+    }
+
+    @Override
+    public List<Customer> queryCustomerByConditionForPage(Map<String, Object> map) {
+        return customerMapper.selectCustomerByConditionForPage(map);
+    }
+
+    @Override
+    public int queryCountOfCustomerByCondition(Map<String, Object> map) {
+        return customerMapper.selectCountOfCustomerByCondition(map);
     }
 }

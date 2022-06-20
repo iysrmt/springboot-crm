@@ -3,6 +3,9 @@ package per.iys.crm.workbench.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.Customer;
 
+import java.util.List;
+import java.util.Map;
+
 @Mapper
 public interface CustomerMapper {
     /**
@@ -60,4 +63,20 @@ public interface CustomerMapper {
      * @return
      */
     int insertCustomer(Customer customer);
+
+    /**
+     * 根据条件分页查询客户
+     *
+     * @param map key: customer, beginNo, pageSize
+     * @return
+     */
+    List<Customer> selectCustomerByConditionForPage(Map<String, Object> map);
+
+    /**
+     * 根据条件查询客户总记录条数
+     *
+     * @param map key: customer, beginNo, pageSize
+     * @return
+     */
+    int selectCountOfCustomerByCondition(Map<String, Object> map);
 }
