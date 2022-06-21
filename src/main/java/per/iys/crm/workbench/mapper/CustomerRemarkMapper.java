@@ -62,4 +62,12 @@ public interface CustomerRemarkMapper {
      * @return
      */
     int insertCustomerRemarkByList(List<CustomerRemark> customerRemarkList);
+
+    /**
+     * 根据CustomerId查询客户备注
+     *
+     * @param customerId
+     * @return
+     */
+    List<CustomerRemark> selectCustomerRemarkByCustomerId(String customerId);
 }

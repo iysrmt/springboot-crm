@@ -54,4 +54,12 @@ public interface CustomerService {
      * @return
      */
     int modifyCustomerById(Customer customer);
+
+    /**
+     * 根据id连接查询指定客户
+     *
+     * @param id
+     * @return
+     */
+    Customer queryCustomerByIdForDetail(String id);
 }

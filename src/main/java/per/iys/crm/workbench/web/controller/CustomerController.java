@@ -10,8 +10,14 @@ import per.iys.crm.commons.utils.DateUtils;
 import per.iys.crm.commons.utils.UUIDUtils;
 import per.iys.crm.settings.domain.User;
 import per.iys.crm.settings.service.UserService;
+import per.iys.crm.workbench.domain.Contacts;
 import per.iys.crm.workbench.domain.Customer;
+import per.iys.crm.workbench.domain.CustomerRemark;
+import per.iys.crm.workbench.domain.Tran;
+import per.iys.crm.workbench.service.ContactsService;
+import per.iys.crm.workbench.service.CustomerRemarkService;
 import per.iys.crm.workbench.service.CustomerService;
+import per.iys.crm.workbench.service.TranService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -25,11 +31,17 @@ public class CustomerController {
 
     private CustomerService customerService;
     private UserService userService;
+    private CustomerRemarkService customerRemarkService;
+    private ContactsService contactsService;
+    private TranService tranService;
 
     @Autowired
-    public CustomerController(CustomerService customerService, UserService userService) {
+    public CustomerController(CustomerService customerService, UserService userService, CustomerRemarkService customerRemarkService, ContactsService contactsService, TranService tranService) {
         this.customerService = customerService;
         this.userService = userService;
+        this.customerRemarkService = customerRemarkService;
+        this.contactsService = contactsService;
+        this.tranService = tranService;
     }
 
     // 客户主页
@@ -142,6 +154,26 @@ public class CustomerController {
         }
 
         return returnObject;
+    }
+
+    // 跳转到备注页
+    @GetMapping("/detail")
+    public String detail(Model model, String id) {
+        // 客户信息
+        Customer customer = customerService.queryCustomerByIdForDetail(id);
+        // 客户备注
+        List<CustomerRemark> customerRemarkList = customerRemarkService.queryCustomerRemarkByCustomerId(id);
+        // 交易
+        List<Tran> tranList = tranService.queryTranByCustomerId(id);
+        // 联系人
+        List<Contacts> contactsList = contactsService.queryContactsByCustomerId(id);
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("customerRemarkList", customerRemarkList);
+        model.addAttribute("tranList", tranList);
+        model.addAttribute("contactsList", contactsList);
+
+        return "workbench/customer/detail";
     }
 
 }

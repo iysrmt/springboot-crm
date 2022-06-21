@@ -103,4 +103,11 @@ public interface CustomerMapper {
      * @return
      */
     int updateCustomerById(Customer customer);
+
+    /**
+     * 根据id连接查询客户
+     * @param id
+     * @return
+     */
+    Customer selectCustomerByIdForDetail(String id);
 }

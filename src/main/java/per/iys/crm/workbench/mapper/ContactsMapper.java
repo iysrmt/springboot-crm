@@ -3,6 +3,8 @@ package per.iys.crm.workbench.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.Contacts;
 
+import java.util.List;
+
 @Mapper
 public interface ContactsMapper {
     /**
@@ -60,4 +62,12 @@ public interface ContactsMapper {
      * @return
      */
     int insertContacts(Contacts contacts);
+
+    /**
+     * 根据客户id查询联系人
+     *
+     * @param customerId
+     * @return
+     */
+    List<Contacts> selectContactsByCustomerId(String customerId);
 }

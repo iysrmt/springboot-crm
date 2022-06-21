@@ -3,6 +3,8 @@ package per.iys.crm.workbench.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.Tran;
 
+import java.util.List;
+
 @Mapper
 public interface TranMapper {
     /**
@@ -53,5 +55,19 @@ public interface TranMapper {
      */
     int updateByPrimaryKey(Tran row);
 
+    /**
+     * 插入一条交易记录
+     *
+     * @param tran
+     * @return
+     */
     int insertTran(Tran tran);
+
+    /**
+     * 根据客户id查询交易记录
+     *
+     * @param customerId
+     * @return
+     */
+    List<Tran> selectTranByCustomerId(String customerId);
 }
