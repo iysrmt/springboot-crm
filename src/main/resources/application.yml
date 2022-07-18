@@ -1,11 +1,3 @@
-server:
-  servlet:
-    context-path: /crm
-
-#数据库数据源配置
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/crm
-    username: iys
-    password: 4381
+  profiles:
+    active: dev
