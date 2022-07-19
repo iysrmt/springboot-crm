@@ -13,4 +13,11 @@ public interface TranService {
      * @return
      */
     List<Tran> queryTranByCustomerId(String customerId);
+
+    /**
+     * 创建交易
+     * @param tran
+     * @return
+     */
+    int saveCreateTran(Tran tran);
 }

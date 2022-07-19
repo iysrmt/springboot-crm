@@ -53,4 +53,14 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer queryCustomerByIdForDetail(String id) {
         return customerMapper.selectCustomerByIdForDetail(id);
     }
+
+    @Override
+    public List<Customer> queryCustomerByNameIsFuzzy(String name) {
+        return customerMapper.selectCustomerByNameIsFuzzy(name);
+    }
+
+    @Override
+    public Customer queryCustomerByName(String name) {
+        return customerMapper.selectCustomerByName(name);
+    }
 }

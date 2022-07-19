@@ -106,8 +106,24 @@ public interface CustomerMapper {
 
     /**
      * 根据id连接查询客户
+     *
      * @param id
      * @return
      */
     Customer selectCustomerByIdForDetail(String id);
+
+    /**
+     * 按客户名模糊查询客户
+     *
+     * @return
+     */
+    List<Customer> selectCustomerByNameIsFuzzy(String name);
+
+    /**
+     * 按客户名精准查询客户
+     *
+     * @param name
+     * @return
+     */
+    Customer selectCustomerByName(String name);
 }

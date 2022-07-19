@@ -22,4 +22,14 @@ public class ContactsServiceImpl implements ContactsService {
     public List<Contacts> queryContactsByCustomerId(String customerId) {
         return contactsMapper.selectContactsByCustomerId(customerId);
     }
+
+    @Override
+    public int saveCreateContacts(Contacts contacts) {
+        return contactsMapper.insertContacts(contacts);
+    }
+
+    @Override
+    public List<Contacts> queryContactsByFullName(String fullName) {
+        return contactsMapper.selectContactsByFullName(fullName);
+    }
 }

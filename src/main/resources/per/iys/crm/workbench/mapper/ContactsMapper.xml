@@ -306,4 +306,13 @@
                  left join tbl_dic_value dv2 on c.appellation = dv2.id
         where c.customer_id = #{customerId}
     </select>
+
+    <select id="selectContactsByFullName" parameterType="string" resultMap="BaseResultMap">
+        select id,
+               full_name,
+               email,
+               m_phone
+        from tbl_contacts
+        where full_name like '%' #{fullName} '%'
+    </select>
 </mapper>

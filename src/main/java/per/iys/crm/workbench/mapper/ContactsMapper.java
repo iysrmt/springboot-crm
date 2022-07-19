@@ -70,4 +70,12 @@ public interface ContactsMapper {
      * @return
      */
     List<Contacts> selectContactsByCustomerId(String customerId);
+
+    /**
+     * 根据联系人名称模糊查找联系人
+     *
+     * @param fullName
+     * @return
+     */
+    List<Contacts> selectContactsByFullName(String fullName);
 }

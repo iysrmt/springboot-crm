@@ -13,4 +13,20 @@ public interface ContactsService {
      * @return
      */
     List<Contacts> queryContactsByCustomerId(String customerId);
+
+    /**
+     * 保存创建的联系人
+     *
+     * @param contacts
+     * @return
+     */
+    int saveCreateContacts(Contacts contacts);
+
+    /**
+     * 根据联系人名称, 模糊查询联系人
+     *
+     * @param fullName
+     * @return
+     */
+    List<Contacts> queryContactsByFullName(String fullName);
 }

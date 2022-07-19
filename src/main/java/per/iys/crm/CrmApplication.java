@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @SpringBootApplication
-// @MapperScan({"per.iys.crm.settings.mapper", "per.iys.crm.workbench.mapper"})
 public class CrmApplication extends SpringBootServletInitializer implements WebMvcConfigurer {
 
     public static void main(String[] args) {

@@ -62,4 +62,19 @@ public interface CustomerService {
      * @return
      */
     Customer queryCustomerByIdForDetail(String id);
+
+    /**
+     * 按客户名模糊查询客户
+     *
+     * @return
+     */
+    List<Customer> queryCustomerByNameIsFuzzy(String name);
+
+    /**
+     * 按客户名精准查询客户
+     *
+     * @param name
+     * @return
+     */
+    Customer queryCustomerByName(String name);
 }

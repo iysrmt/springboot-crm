@@ -3,21 +3,22 @@
 <head>
     <base th:href="@{/}">
     <meta charset="UTF-8">
+    <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css" rel="stylesheet">
 
-    <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" rel="stylesheet"
-          type="text/css"/>
+    <script src="jquery/jquery-1.11.1-min.js"></script>
+    <script src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+    <script src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+    <script src="jquery/bs_pagination-master/localization/zh.js"></script>
 
-    <script src="jquery/jquery-1.11.1-min.js" type="text/javascript"></script>
-    <script src="jquery/bootstrap_3.3.0/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.min.js"
-            type="text/javascript"></script>
-    <script src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"
-            type="text/javascript"></script>
-
-    <script type="text/javascript">
+    <script th:inline="javascript">
 
         $(function () {
+            // ========== 入口函数 start ==========
+
 
             //定制字段
             $("#definedColumns > li").click(function (e) {
@@ -25,6 +26,30 @@
                 e.stopPropagation();
             });
 
+            // 日期选择插件
+            $(".date-time").datetimepicker({
+                language: "zh-CN",
+                format: "yyyy-mm-dd",
+                minView: "month",
+                initialDate: new Date(),
+                autoclose: true,
+                todayBtn: true,
+                clearBtn: true
+            });
+
+            // 实现保存联系人
+            $("#createBtn").click(function () {
+                // 清空表单内容
+                $("#create-contacts-from").get(0).reset();
+                // 展示模态窗口
+                $("#createContactsModal").modal("show");
+            });
+            $("#saveBtn").click(function () {
+                // 收集参数
+                // 验证内容
+                // 发送请求
+            })
+            // ========== 入口函数 end ==========
         });
 
     </script>
@@ -43,55 +68,39 @@
                 <h4 class="modal-title" id="myModalLabelx">创建联系人</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" role="form">
+                <form class="form-horizontal" role="form" id="create-contacts-from">
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="create-contactsOwner">所有者<span
+                        <label class="col-sm-2 control-label" for="create-owner">所有者<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="create-contactsOwner">
-                                <option>zhangsan</option>
-                                <option>lisi</option>
-                                <option>wangwu</option>
+                            <select class="form-control" id="create-owner">
+                                <option th:each="user:${userList}" th:text="${user.name}"
+                                        th:value="${user.id}"></option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label" for="create-clueSource">来源</label>
+                        <label class="col-sm-2 control-label" for="create-source">来源</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="create-clueSource">
+                            <select class="form-control" id="create-source">
                                 <option></option>
-                                <option>广告</option>
-                                <option>推销电话</option>
-                                <option>员工介绍</option>
-                                <option>外部介绍</option>
-                                <option>在线商场</option>
-                                <option>合作伙伴</option>
-                                <option>公开媒介</option>
-                                <option>销售邮件</option>
-                                <option>合作伙伴研讨会</option>
-                                <option>内部研讨会</option>
-                                <option>交易会</option>
-                                <option>web下载</option>
-                                <option>web调研</option>
-                                <option>聊天</option>
+                                <option th:each="source:${sourceList}" th:value="${source.id}"
+                                        th:text="${source.value}"></option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="create-surname">姓名<span
+                        <label class="col-sm-2 control-label" for="create-fullName">姓名<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input class="form-control" id="create-surname" type="text">
+                            <input class="form-control" id="create-fullName" type="text">
                         </div>
-                        <label class="col-sm-2 control-label" for="create-call">称呼</label>
+                        <label class="col-sm-2 control-label" for="create-appellation">称呼</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="create-call">
+                            <select class="form-control" id="create-appellation">
                                 <option></option>
-                                <option>先生</option>
-                                <option>夫人</option>
-                                <option>女士</option>
-                                <option>博士</option>
-                                <option>教授</option>
+                                <option th:each="appellation:${appellationList}" th:value="${appellation.id}"
+                                        th:text="${appellation.value}"></option>
                             </select>
                         </div>
 
@@ -102,9 +111,9 @@
                         <div class="col-sm-10" style="width: 300px;">
                             <input class="form-control" id="create-job" type="text">
                         </div>
-                        <label class="col-sm-2 control-label" for="create-mphone">手机</label>
+                        <label class="col-sm-2 control-label" for="create-mPhone">手机</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input class="form-control" id="create-mphone" type="text">
+                            <input class="form-control" id="create-mPhone" type="text">
                         </div>
                     </div>
 
@@ -128,9 +137,9 @@
                     </div>
 
                     <div class="form-group" style="position: relative;">
-                        <label class="col-sm-2 control-label" for="create-describe">描述</label>
+                        <label class="col-sm-2 control-label" for="create-description">描述</label>
                         <div class="col-sm-10" style="width: 81%;">
-                            <textarea class="form-control" id="create-describe" rows="3"></textarea>
+                            <textarea class="form-control" id="create-description" rows="3"></textarea>
                         </div>
                     </div>
 
@@ -138,15 +147,15 @@
 
                     <div style="position: relative;top: 15px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-contactSummary1">联系纪要</label>
+                            <label class="col-sm-2 control-label" for="create-contactSummary">联系纪要</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="create-contactSummary1" rows="3"></textarea>
+                                <textarea class="form-control" id="create-contactSummary" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-nextContactTime1">下次联系时间</label>
+                            <label class="col-sm-2 control-label" for="create-nextContactTime">下次联系时间</label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input class="form-control" id="create-nextContactTime1" type="text">
+                                <input class="form-control date-time" id="create-nextContactTime" type="text" readonly>
                             </div>
                         </div>
                     </div>
@@ -155,9 +164,9 @@
 
                     <div style="position: relative;top: 20px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="edit-address1">详细地址</label>
+                            <label class="col-sm-2 control-label" for="create-address">详细地址</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="edit-address1" rows="1">北京大兴区大族企业湾</textarea>
+                                <textarea class="form-control" id="create-address" rows="1">北京大兴区大族企业湾</textarea>
                             </div>
                         </div>
                     </div>
@@ -166,7 +175,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
-                <button class="btn btn-primary" data-dismiss="modal" type="button">保存</button>
+                <button class="btn btn-primary" type="button" id="saveBtn">保存</button>
             </div>
         </div>
     </div>
@@ -180,58 +189,42 @@
                 <button class="close" data-dismiss="modal" type="button">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title" id="myModalLabel1">修改联系人</h4>
+                <h4 class="modal-title" id="myModalLabel">修改联系人</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="edit-contactsOwner">所有者<span
+                        <label class="col-sm-2 control-label" for="edit-owner">所有者<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="edit-contactsOwner">
-                                <option selected>zhangsan</option>
-                                <option>lisi</option>
-                                <option>wangwu</option>
+                            <select class="form-control" id="edit-owner">
+                                <option th:each="user:${userList}" th:value="${user.id}"
+                                        th:text="${user.name}"></option>
                             </select>
                         </div>
-                        <label class="col-sm-2 control-label" for="edit-clueSource1">来源</label>
+                        <label class="col-sm-2 control-label" for="edit-source">来源</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="edit-clueSource1">
+                            <select class="form-control" id="edit-source">
                                 <option></option>
-                                <option selected>广告</option>
-                                <option>推销电话</option>
-                                <option>员工介绍</option>
-                                <option>外部介绍</option>
-                                <option>在线商场</option>
-                                <option>合作伙伴</option>
-                                <option>公开媒介</option>
-                                <option>销售邮件</option>
-                                <option>合作伙伴研讨会</option>
-                                <option>内部研讨会</option>
-                                <option>交易会</option>
-                                <option>web下载</option>
-                                <option>web调研</option>
-                                <option>聊天</option>
+                                <option th:each="source:${sourceList}" th:value="${source.id}"
+                                        th:text="${source.value}"></option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="edit-surname">姓名<span
+                        <label class="col-sm-2 control-label" for="edit-fullName">姓名<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input class="form-control" id="edit-surname" type="text" value="李四">
+                            <input class="form-control" id="edit-fullName" type="text" value="李四">
                         </div>
-                        <label class="col-sm-2 control-label" for="edit-call">称呼</label>
+                        <label class="col-sm-2 control-label" for="edit-appellation">称呼</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <select class="form-control" id="edit-call">
+                            <select class="form-control" id="edit-appellation">
                                 <option></option>
-                                <option selected>先生</option>
-                                <option>夫人</option>
-                                <option>女士</option>
-                                <option>博士</option>
-                                <option>教授</option>
+                                <option th:each="appellation:${appellationList}" th:value="${appellation.id}"
+                                        th:text="${appellation.value}"></option>
                             </select>
                         </div>
                     </div>
@@ -241,9 +234,9 @@
                         <div class="col-sm-10" style="width: 300px;">
                             <input class="form-control" id="edit-job" type="text" value="CTO">
                         </div>
-                        <label class="col-sm-2 control-label" for="edit-mphone">手机</label>
+                        <label class="col-sm-2 control-label" for="edit-mPhone">手机</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input class="form-control" id="edit-mphone" type="text" value="12345678901">
+                            <input class="form-control" id="edit-mPhone" type="text" value="12345678901">
                         </div>
                     </div>
 
@@ -267,9 +260,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="edit-describe">描述</label>
+                        <label class="col-sm-2 control-label" for="edit-description">描述</label>
                         <div class="col-sm-10" style="width: 81%;">
-                            <textarea class="form-control" id="edit-describe" rows="3">这是一条线索的描述信息</textarea>
+                            <textarea class="form-control" id="edit-description" rows="3">这是一条线索的描述信息</textarea>
                         </div>
                     </div>
 
@@ -277,15 +270,15 @@
 
                     <div style="position: relative;top: 15px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-contactSummary">联系纪要</label>
+                            <label class="col-sm-2 control-label" for="edit-contactSummary">联系纪要</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="create-contactSummary" rows="3"></textarea>
+                                <textarea class="form-control" id="edit-contactSummary" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="create-nextContactTime">下次联系时间</label>
+                            <label class="col-sm-2 control-label" for="edit-nextContactTime">下次联系时间</label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input class="form-control" id="create-nextContactTime" type="text">
+                                <input class="form-control date-time" id="edit-nextContactTime" type="text" readonly>
                             </div>
                         </div>
                     </div>
@@ -294,9 +287,9 @@
 
                     <div style="position: relative;top: 20px;">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="edit-address2">详细地址</label>
+                            <label class="col-sm-2 control-label" for="edit-address">详细地址</label>
                             <div class="col-sm-10" style="width: 81%;">
-                                <textarea class="form-control" id="edit-address2" rows="1">北京大兴区大族企业湾</textarea>
+                                <textarea class="form-control" id="edit-address" rows="1">北京大兴区大族企业湾</textarea>
                             </div>
                         </div>
                     </div>
@@ -353,7 +346,7 @@
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">来源</div>
-                        <select class="form-control" id="edit-clueSource">
+                        <select class="form-control" id="search-clueSource">
                             <option></option>
                             <option>广告</option>
                             <option>推销电话</option>
@@ -387,7 +380,7 @@
         <div class="btn-toolbar" role="toolbar"
              style="background-color: #F7F7F7; height: 50px; position: relative;top: 10px;">
             <div class="btn-group" style="position: relative; top: 18%;">
-                <button class="btn btn-primary" data-target="#createContactsModal" data-toggle="modal" type="button">
+                <button class="btn btn-primary" type="button" id="createBtn">
                     <span class="glyphicon glyphicon-plus"></span> 创建
                 </button>
                 <button class="btn btn-default" data-target="#editContactsModal" data-toggle="modal" type="button"><span
