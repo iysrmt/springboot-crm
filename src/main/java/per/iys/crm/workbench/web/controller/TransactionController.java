@@ -137,12 +137,4 @@ public class TransactionController {
         return possibility;
     }
 
-    // 获取所有客户名
-    @ResponseBody
-    @GetMapping("/queryAllCustomerName")
-    public Object queryAllCustomerName(String name) {
-        List<Customer> customerNameList = customerService.queryCustomerByNameIsFuzzy(name);
-        return customerNameList;
-    }
-
 }
