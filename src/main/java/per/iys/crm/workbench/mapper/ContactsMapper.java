@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import per.iys.crm.workbench.domain.Contacts;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ContactsMapper {
@@ -78,4 +79,19 @@ public interface ContactsMapper {
      * @return
      */
     List<Contacts> selectContactsByFullName(String fullName);
+
+    /**
+     * 根据条件分页展示联系人
+     *
+     * @param map key: contacts, beginNo, pageSize
+     * @return
+     */
+    List<Contacts> selectContactsByConditionPaging(Map<String, Object> map);
+
+    /**
+     * 查询符合条件的联系人总条数
+     * @param contacts
+     * @return
+     */
+    int selectContactsByConditionCount(Contacts contacts);
 }

@@ -7,6 +7,7 @@ import per.iys.crm.workbench.mapper.ContactsMapper;
 import per.iys.crm.workbench.service.ContactsService;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContactsServiceImpl implements ContactsService {
@@ -31,5 +32,15 @@ public class ContactsServiceImpl implements ContactsService {
     @Override
     public List<Contacts> queryContactsByFullName(String fullName) {
         return contactsMapper.selectContactsByFullName(fullName);
+    }
+
+    @Override
+    public List<Contacts> queryContactsByConditionPaging(Map<String, Object> map) {
+        return contactsMapper.selectContactsByConditionPaging(map);
+    }
+
+    @Override
+    public int queryContactsByConditionCount(Contacts contacts) {
+        return contactsMapper.selectContactsByConditionCount(contacts);
     }
 }

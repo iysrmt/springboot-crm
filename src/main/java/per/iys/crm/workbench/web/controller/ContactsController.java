@@ -21,7 +21,9 @@ import per.iys.crm.workbench.service.DicValueService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/workbench/contacts")
@@ -78,5 +80,27 @@ public class ContactsController {
             returnObject.setMessage("系统繁忙, 请稍后重试...");
         }
         return returnObject;
+    }
+
+    // 联系人展示
+    @ResponseBody
+    @GetMapping("/queryContactsByConditionPaging")
+    public Object queryContactsByConditionPaging(Contacts contacts, int pageNo, int pageSize) {
+        // 封装参数
+        pageNo = (pageNo - 1) * pageSize;
+        Map map = new HashMap();
+        map.put("contacts", contacts);
+        map.put("beginNo", pageNo);
+        map.put("pageSize", pageSize);
+
+        List<Contacts> contactsList = contactsService.queryContactsByConditionPaging(map);
+        int totalRows = contactsService.queryContactsByConditionCount(contacts);
+
+        // 封装
+        Map retMap = new HashMap();
+        retMap.put("contactsList", contactsList);
+        retMap.put("totalRows", totalRows);
+
+        return retMap;
     }
 }

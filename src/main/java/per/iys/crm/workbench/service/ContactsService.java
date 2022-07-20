@@ -3,6 +3,7 @@ package per.iys.crm.workbench.service;
 import per.iys.crm.workbench.domain.Contacts;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ContactsService {
 
@@ -29,4 +30,20 @@ public interface ContactsService {
      * @return
      */
     List<Contacts> queryContactsByFullName(String fullName);
+
+    /**
+     * 根据条件分页展示联系人
+     *
+     * @param map key: contacts, beginNo, pageSize
+     * @return
+     */
+    List<Contacts> queryContactsByConditionPaging(Map<String, Object> map);
+
+    /**
+     * 查询符合条件的联系人总条数
+     *
+     * @param contacts
+     * @return
+     */
+    int queryContactsByConditionCount(Contacts contacts);
 }

@@ -315,4 +315,86 @@
         from tbl_contacts
         where full_name like '%' #{fullName} '%'
     </select>
+
+    <select id="selectContactsByConditionPaging" parameterType="map" resultMap="BaseResultMap">
+        select
+        con.id,
+        u1.name as owner,
+        dv1.value as source,
+        cus1.name as customer_id,
+        con.full_name,
+        dv2.value as appellation,
+        con.email,
+        con.m_phone,
+        con.job,
+        u2.name as create_by,
+        con.create_time,
+        u3.name as edit_by,
+        con.edit_time,
+        con.description,
+        con.contact_summary,
+        con.next_contact_time,
+        con.address
+        from tbl_contacts con
+        join tbl_user u1
+        on u1.id = con.owner
+        join tbl_user u2
+        on u2.id = con.create_by
+        left join tbl_user u3
+        on u3.id = con.edit_by
+        left join tbl_customer cus1
+        on cus1.id = con.customer_id
+        left join tbl_dic_value dv1
+        on dv1.id = con.source
+        left join tbl_dic_value dv2
+        on dv2.id = con.appellation
+        <where>
+            <if test="contacts.owner!=null and contacts.owner!=''">
+                and u1.name like '%' #{contacts.owner} '%'
+            </if>
+            <if test="contacts.fullName!=null and contacts.fullName!=''">
+                and con.full_name like '%' #{contacts.fullName} '%'
+            </if>
+            <if test="contacts.customerId!=null and contacts.customerId!=''">
+                and cus1.name like '%' #{contacts.customerId} '%'
+            </if>
+            <if test="contacts.source!=null and contacts.source!=''">
+                and con.source = #{contacts.source}
+            </if>
+        </where>
+        order by con.create_time desc
+        limit #{beginNo}, #{pageSize}
+    </select>
+
+    <select id="selectContactsByConditionCount" parameterType="per.iys.crm.workbench.domain.Contacts" resultType="int">
+        select
+        count(*)
+        from tbl_contacts con
+        join tbl_user u1
+        on u1.id = con.owner
+        join tbl_user u2
+        on u2.id = con.create_by
+        left join tbl_user u3
+        on u3.id = con.edit_by
+        left join tbl_customer cus1
+        on cus1.id = con.customer_id
+        left join tbl_dic_value dv1
+        on dv1.id = con.source
+        left join tbl_dic_value dv2
+        on dv2.id = con.appellation
+        <where>
+            <if test="owner!=null and owner!=''">
+                and u1.name like '%' #{owner} '%'
+            </if>
+            <if test="fullName!=null and fullName!=''">
+                and con.full_name like '%' #{fullName} '%'
+            </if>
+            <if test="customerId!=null and customerId!=''">
+                and cus1.name like '%' #{customerId} '%'
+            </if>
+            <if test="source!=null and source!=''">
+                and con.full_name = #{source}
+            </if>
+        </where>
+    </select>
 </mapper>
