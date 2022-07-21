@@ -148,6 +148,128 @@
                     }
                 });
             })
+
+            // 实现修改功能
+            $("#edit-customerName").typeahead({
+                // 键盘弹起会自动触发该函数
+                source: (jquery, process) => {
+                    // 发送请求
+                    $.ajax({
+                        url: "workbench/customer/queryAllCustomerName",
+                        type: "get",
+                        data: {
+                            name: jquery
+                        },
+                        dataType: "json",
+                        success: (res) => {
+                            let nameList = [];
+                            $.each(res, (i, v) => {
+                                nameList.push(v.name);
+                            })
+                            process(nameList);
+                        }
+                    })
+                }
+            });
+            $("#editBtn").click(function () {
+                let checkIds = $("#tbody-paginationDisplay input[type='checkbox']:checked");
+                if (checkIds.size() === 0) {
+                    alert("请选择需要修改的联系人");
+                    return;
+                }
+                if (checkIds.size() > 1) {
+                    alert("一次只能修改一个联系人");
+                    return;
+                }
+                let id = checkIds.val();
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/contacts/queryContactsById",
+                    type: "get",
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: res => {
+                        // 填充参数
+                        $("#edit-id").val(id);
+                        $("#edit-owner").val(res.owner);
+                        $("#edit-source").val(res.source);
+                        $("#edit-fullName").val(res.fullName);
+                        $("#edit-appellation").val(res.appellation);
+                        $("#edit-job").val(res.job);
+                        $("#edit-mPhone").val(res.mPhone);
+                        $("#edit-email").val(res.email);
+                        $("#edit-customerName").val(res.customerId);
+                        $("#edit-description").val(res.description);
+                        $("#edit-contactSummary").val(res.contactSummary);
+                        $("#edit-nextContactTime").val(res.nextContactTime);
+                        $("#edit-address").val(res.address);
+
+                        // 展示模态窗口
+                        $("#editContactsModal").modal("show");
+                    }
+                })
+            })
+
+            $("#editSaveBtn").click(function () {
+                // 收集参数
+                let id = $("#edit-id").val();
+                let owner = $("#edit-owner").val();
+                let source = $("#edit-source").val();
+                let fullName = $.trim($("#edit-fullName").val());
+                let appellation = $("#edit-appellation").val();
+                let job = $.trim($("#edit-job").val());
+                let mPhone = $.trim($("#edit-mPhone").val());
+                let email = $.trim($("#edit-email").val());
+                let customerId = $.trim($("#edit-customerName").val());
+                let description = $.trim($("#edit-description").val());
+                let contactSummary = $.trim($("#edit-contactSummary").val());
+                let nextContactTime = $("#edit-nextContactTime").val();
+                let address = $.trim($("#edit-address").val());
+
+                // 内容格式验证
+                if (fullName === "") {
+                    alert("联系人姓名不能为空!");
+                    return;
+                }
+                let mPhoneRegExp = /^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+                if (mPhone !== "" && !mPhoneRegExp.test(mPhone)) {
+                    alert("手机号格式错误!");
+                    return;
+                }
+
+                // 发送请求
+                $.ajax({
+                    url: "workbench/contacts/modifyContactsById",
+                    type: "put",
+                    data: {
+                        id: id,
+                        owner: owner,
+                        source: source,
+                        fullName: fullName,
+                        appellation: appellation,
+                        job: job,
+                        mPhone: mPhone,
+                        email: email,
+                        customerId: customerId,
+                        description: description,
+                        contactSummary: contactSummary,
+                        nextContactTime: nextContactTime,
+                        address: address
+                    },
+                    dataType: "json",
+                    success: res => {
+                        if (res.status === "1") {
+                            $("#editContactsModal").modal("hide");
+                            pagination(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                        } else {
+                            alert(res.message)
+                        }
+                    }
+                });
+            })
             // ========== 入口函数 end ==========
         });
 
@@ -177,7 +299,7 @@
                     $.each(resp.contactsList, function (i, v) {
                         // 拼接页面
                         htmlStr += "<tr>";
-                        htmlStr += "<td><input type=\"checkbox\"/></td>";
+                        htmlStr += "<td><input type=\"checkbox\" value=\"" + v.id + "\"/></td>";
                         htmlStr += "<td><a onClick=\"window.location.href='detail.html';\" style=\"text-decoration: none; cursor: pointer;\">" + v.fullName + "</a></td>";
                         htmlStr += "<td>" + v.customerId + "</td>";
                         htmlStr += "<td>" + v.owner + "</td>";
@@ -352,7 +474,8 @@
                 <h4 class="modal-title" id="myModalLabel">修改联系人</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" role="form">
+                <input type="hidden" id="edit-id">
+                <form class="form-horizontal" role="form" id="editForm">
 
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="edit-owner">所有者<span
@@ -458,7 +581,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
-                <button class="btn btn-primary" data-dismiss="modal" type="button">更新</button>
+                <button class="btn btn-primary" type="button" id="editSaveBtn">更新</button>
             </div>
         </div>
     </div>
@@ -531,10 +654,12 @@
                 <button class="btn btn-primary" type="button" id="createBtn">
                     <span class="glyphicon glyphicon-plus"></span> 创建
                 </button>
-                <button class="btn btn-default" data-target="#editContactsModal" data-toggle="modal" type="button"><span
+                <button class="btn btn-default" type="button" id="editBtn"><span
                         class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-minus"
+                                                                   id="deleteBtn"></span> 删除
+                </button>
             </div>
 
 

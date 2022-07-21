@@ -46,4 +46,20 @@ public interface ContactsService {
      * @return
      */
     int queryContactsByConditionCount(Contacts contacts);
+
+    /**
+     * 根据联系人id查询联系人
+     *
+     * @param id
+     * @return
+     */
+    Contacts queryContactsById(String id);
+
+    /**
+     * 根据联系人id更新信息
+     *
+     * @param contacts
+     * @return
+     */
+    int modifyContactsById(Contacts contacts);
 }

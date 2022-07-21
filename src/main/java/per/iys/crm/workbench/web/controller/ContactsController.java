@@ -3,10 +3,7 @@ package per.iys.crm.workbench.web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import per.iys.crm.commons.constants.Constants;
 import per.iys.crm.commons.domain.ReturnObject;
 import per.iys.crm.commons.utils.DateUtils;
@@ -103,4 +100,40 @@ public class ContactsController {
 
         return retMap;
     }
+
+    // 根据id获取联系人
+    @ResponseBody
+    @GetMapping("/queryContactsById")
+    public Object queryContactsById(String id) {
+        return contactsService.queryContactsById(id);
+    }
+
+    // 根据联系人id更新信息
+    @ResponseBody
+    @PutMapping("/modifyContactsById")
+    public Object modifyContactsById(HttpSession session, Contacts contacts) {
+        ReturnObject returnObject = new ReturnObject();
+        User user = (User) session.getAttribute(Constants.SESSION_USER);
+
+        // 二次封装
+        contacts.setEditBy(user.getId());
+        contacts.setEditTime(DateUtils.format(new Date()));
+
+        try {
+            int ret = contactsService.modifyContactsById(contacts);
+            if (ret > 0) {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_SUCCESS);
+            } else {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+                returnObject.setMessage("系统繁忙请稍后重试...");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+            returnObject.setMessage("系统繁忙请稍后重试...");
+        }
+
+        return returnObject;
+    }
+
 }

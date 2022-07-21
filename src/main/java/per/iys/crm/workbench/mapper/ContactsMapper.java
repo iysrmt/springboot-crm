@@ -90,8 +90,25 @@ public interface ContactsMapper {
 
     /**
      * 查询符合条件的联系人总条数
+     *
      * @param contacts
      * @return
      */
     int selectContactsByConditionCount(Contacts contacts);
+
+    /**
+     * 根据联系人id查询联系人
+     *
+     * @param id
+     * @return
+     */
+    Contacts selectContactsById(String id);
+
+    /**
+     * 根据id更新联系人信息
+     *
+     * @param contacts
+     * @return
+     */
+    int updateContactsById(Contacts contacts);
 }

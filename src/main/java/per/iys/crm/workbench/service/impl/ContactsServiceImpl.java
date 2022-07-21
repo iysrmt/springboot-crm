@@ -67,4 +67,30 @@ public class ContactsServiceImpl implements ContactsService {
     public int queryContactsByConditionCount(Contacts contacts) {
         return contactsMapper.selectContactsByConditionCount(contacts);
     }
+
+    @Override
+    public Contacts queryContactsById(String id) {
+        return contactsMapper.selectContactsById(id);
+    }
+
+    @Transactional
+    @Override
+    public int modifyContactsById(Contacts contacts) {
+        Customer customer = customerMapper.selectCustomerByName(contacts.getCustomerId());
+        if (customer == null) {
+            // 当客户不存在时, 创建客户
+            customer = new Customer();
+            customer.setId(UUIDUtils.getUUID());
+            customer.setName(contacts.getCustomerId());
+            customer.setCreateTime(DateUtils.format(new Date()));
+            customer.setCreateBy(contacts.getCreateBy());
+            customer.setOwner(contacts.getOwner());
+            contacts.setCustomerId(customer.getId());
+            customerMapper.insertCustomer(customer);
+        } else {
+            // 客户存在时
+            contacts.setCustomerId(customer.getId());
+        }
+        return contactsMapper.updateContactsById(contacts);
+    }
 }
