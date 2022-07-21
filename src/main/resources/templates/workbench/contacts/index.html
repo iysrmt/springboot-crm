@@ -270,6 +270,38 @@
                     }
                 });
             })
+
+            // 删除按钮添加单击事件
+            $("#deleteBtn").click(function () {
+                let checkIds = $("#tbody-paginationDisplay input[type='checkbox']:checked");
+                if (checkIds.size() === 0) {
+                    alert("请选择要删除的联系人");
+                    return;
+                }
+                if (window.confirm("确定删除?")) {
+                    let ids = "";
+                    $.each(checkIds, function () {
+                        ids += "id=" + this.value + "&";
+                    });
+                    ids = ids.substr(0, ids.length - 1);
+
+                    // 发送请求
+                    $.ajax({
+                        url: "workbench/contacts/removeContactsById",
+                        type: "delete",
+                        data: ids,
+                        dataType: "json",
+                        success: function (resp) {
+                            if (resp.status === "1") {
+                                // 刷新列表
+                                pagination(1, $("#page").bs_pagination('getOption', 'rowsPerPage'));
+                            } else {
+                                alert(resp.message);
+                            }
+                        }
+                    })
+                }
+            })
             // ========== 入口函数 end ==========
         });
 
@@ -657,8 +689,8 @@
                 <button class="btn btn-default" type="button" id="editBtn"><span
                         class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button class="btn btn-danger" type="button"><span class="glyphicon glyphicon-minus"
-                                                                   id="deleteBtn"></span> 删除
+                <button class="btn btn-danger" type="button" id="deleteBtn"><span
+                        class="glyphicon glyphicon-minus"></span> 删除
                 </button>
             </div>
 

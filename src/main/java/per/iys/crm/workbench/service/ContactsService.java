@@ -62,4 +62,12 @@ public interface ContactsService {
      * @return
      */
     int modifyContactsById(Contacts contacts);
+
+    /**
+     * 根据多条id删除联系人
+     *
+     * @param ids
+     * @return
+     */
+    int removeContactsById(String[] ids);
 }

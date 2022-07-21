@@ -136,4 +136,26 @@ public class ContactsController {
         return returnObject;
     }
 
+    // 删除联系人
+    @ResponseBody
+    @DeleteMapping("/removeContactsById")
+    public Object removeContactsById(String[] id) {
+        ReturnObject returnObject = new ReturnObject();
+
+        try {
+            int ret = contactsService.removeContactsById(id);
+            if (ret > 0) {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_SUCCESS);
+            } else {
+                returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+                returnObject.setMessage("系统繁忙, 请稍后重试...");
+            }
+        } catch (Exception e) {
+            returnObject.setStatus(Constants.RETURN_OBJECT_STATUS_FAIL);
+            returnObject.setMessage("系统繁忙, 请稍后重试...");
+        }
+
+        return returnObject;
+    }
+
 }

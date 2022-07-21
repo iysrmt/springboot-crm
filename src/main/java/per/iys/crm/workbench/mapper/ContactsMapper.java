@@ -111,4 +111,11 @@ public interface ContactsMapper {
      * @return
      */
     int updateContactsById(Contacts contacts);
+
+    /**
+     * 根据id删除联系人
+     * @param ids
+     * @return
+     */
+    int deleteContactsById(String[] ids);
 }

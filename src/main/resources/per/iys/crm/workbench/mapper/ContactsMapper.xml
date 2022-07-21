@@ -444,4 +444,13 @@
             address           = #{address}
         where id = #{id}
     </update>
+
+    <delete id="deleteContactsById" parameterType="string">
+        delete
+        from tbl_contacts
+        where id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

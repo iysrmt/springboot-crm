@@ -93,4 +93,9 @@ public class ContactsServiceImpl implements ContactsService {
         }
         return contactsMapper.updateContactsById(contacts);
     }
+
+    @Override
+    public int removeContactsById(String[] ids) {
+        return contactsMapper.deleteContactsById(ids);
+    }
 }
